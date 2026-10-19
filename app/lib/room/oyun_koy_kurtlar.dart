@@ -153,7 +153,7 @@ class _GeceIstemiDurum extends State<_GeceIstemi> {
   bool _zehirSec = false;
 
   void _gonder(String kind, [String? hedef]) {
-    final id = widget.istemci.gonder('nightAction', {'kind': kind, if (hedef != null) 'target': hedef});
+    final id = widget.istemci.gonder('nightAction', {'kind': kind, 'target': ?hedef});
     if (id != null) setState(() => _verilen = kind);
   }
 

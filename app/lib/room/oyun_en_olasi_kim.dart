@@ -90,7 +90,10 @@ class _OylamaDurum extends State<_Oylama> {
     final ozel = i.ozel;
     final sunucudaki = widget.tahmin ? ozel?['myPredict'] : ozel?['myVote'];
     final canli = i.son['myVote'];
-    final secili = _secim ?? (canli != null && canli['qId'] == widget.qId ? canli['target'] as String? : null) ?? (sunucudaki is String ? sunucudaki : null);
+    final canliHedef = canli != null && canli['qId'] == widget.qId ? canli['target'] : null;
+    final secili = _secim ??
+        (canliHedef is String ? canliHedef : null) ??
+        (sunucudaki is String ? sunucudaki : null);
     final izleyici = i.rol != 'player';
     final ilerleme = i.son['voteProgress'] ?? (i.acik['voteProgress'] as Map<String, dynamic>?);
     final kendineYasak = i.ayarlar['kendineOy'] != 'serbest' && !widget.tahmin;

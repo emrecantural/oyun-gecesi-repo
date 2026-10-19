@@ -512,8 +512,8 @@ class _AyarTanimi {
 String _ham(Object v) => '$v';
 
 final _ayarlar07 = [
-  _AyarTanimi('soruSayisi', 'Soru sayısı', const [10, 15, 20], _ham),
-  _AyarTanimi('oySuresi', 'Oy süresi (sn)', const [10, 15, 20], _ham),
+  const _AyarTanimi('soruSayisi', 'Soru sayısı', const [10, 15, 20], _ham),
+  const _AyarTanimi('oySuresi', 'Oy süresi (sn)', const [10, 15, 20], _ham),
   _AyarTanimi('kendineOy', 'Kendine oy', const ['yasak', 'serbest'], (v) => v == 'yasak' ? 'Yasak' : 'Serbest'),
   _AyarTanimi('tahmin', 'Tahmin modu', const [false, true], (v) => v == true ? 'Açık' : 'Kapalı'),
   _AyarTanimi('seviye', 'Seviye', const ['gunluk', 'cesur', 'yilbasi'], (v) => switch (v) {
@@ -525,7 +525,7 @@ final _ayarlar07 = [
 ];
 
 final _ayarlar01 = [
-  _AyarTanimi('kartSayisi', 'Kart sayısı', const [1, 2, 3], _ham),
+  const _AyarTanimi('kartSayisi', 'Kart sayısı', const [1, 2, 3], _ham),
   _AyarTanimi('hiz', 'Çekim hızı', const [3, 5, 8, 0], (v) => v == 0 ? 'Elle' : '$v sn'),
   _AyarTanimi('otoIsaret', 'Otomatik işaretleme', const [true, false], (v) => v == true ? 'Açık' : 'Kapalı'),
   _AyarTanimi('ceza', 'Yanlış bildirim cezası', const [0, 3], (v) => v == 0 ? 'Yok' : '3 çekim'),
@@ -534,8 +534,8 @@ final _ayarlar01 = [
 ];
 
 final _ayarlar03 = [
-  _AyarTanimi('geceSn', 'Gece süresi (sn)', const [20, 25, 35], _ham),
-  _AyarTanimi('tartismaSn', 'Tartışma (sn)', const [60, 90, 120, 180], _ham),
+  const _AyarTanimi('geceSn', 'Gece süresi (sn)', const [20, 25, 35], _ham),
+  const _AyarTanimi('tartismaSn', 'Tartışma (sn)', const [60, 90, 120, 180], _ham),
   _AyarTanimi('oylama', 'Oylama', const ['acik', 'gizli'], (v) => v == 'acik' ? 'Açık' : 'Gizli'),
   _AyarTanimi('rolAc', 'Ölenin rolü açılsın', const ['evet', 'hayir'], (v) => v == 'evet' ? 'Evet' : 'Hayır'),
   _AyarTanimi('esit', 'Eşit oyda', const ['kimse', 'yeniden'], (v) => v == 'kimse' ? 'Kimse asılmaz' : 'Yeniden oylama'),

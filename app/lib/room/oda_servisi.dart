@@ -125,7 +125,7 @@ Future<OdaGirisi> odaKur({
     'game': oyunId,
     'nickname': takmaAd,
     'installId': installId,
-    if (ayarlar != null) 'settings': ayarlar,
+    'settings': ?ayarlar,
   });
   final kod = j['code'] as String;
   return OdaGirisi(
