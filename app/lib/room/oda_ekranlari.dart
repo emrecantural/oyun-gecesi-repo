@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../app/premium.dart';
+import '../app/settings.dart';
 import '../app/theme.dart';
 import '../games/registry.dart';
 import '../monetization/oda_gecisi.dart';
@@ -40,6 +41,12 @@ class _OdaKurDurum extends ConsumerState<OdaKurEkrani> {
   String? _hata;
 
   @override
+  void initState() {
+    super.initState();
+    _ad.text = ref.read(ayarlarProvider).takmaAd;
+  }
+
+  @override
   void dispose() {
     _ad.dispose();
     super.dispose();
@@ -65,6 +72,7 @@ class _OdaKurDurum extends ConsumerState<OdaKurEkrani> {
         passToken: ref.read(odaGecisiProvider).gecisId,
       );
       if (!mounted) return;
+      unawaited(ref.read(ayarlarProvider.notifier).takmaAdKaydet(ad));
       context.pushReplacement('/oda/${giris.kod}', extra: giris);
     } on OdaHatasi catch (e) {
       if (mounted) setState(() => _hata = e.kod);
@@ -125,19 +133,25 @@ class _OdaKurDurum extends ConsumerState<OdaKurEkrani> {
 }
 
 /// Odaya katıl: kod + takma ad + (isteğe bağlı) rol.
-class OdaKatilEkrani extends StatefulWidget {
+class OdaKatilEkrani extends ConsumerStatefulWidget {
   const OdaKatilEkrani({super.key});
 
   @override
-  State<OdaKatilEkrani> createState() => _OdaKatilDurum();
+  ConsumerState<OdaKatilEkrani> createState() => _OdaKatilDurum();
 }
 
-class _OdaKatilDurum extends State<OdaKatilEkrani> {
+class _OdaKatilDurum extends ConsumerState<OdaKatilEkrani> {
   final _kod = TextEditingController();
   final _ad = TextEditingController();
   String _rol = 'player';
   bool _mesgul = false;
   String? _hata;
+
+  @override
+  void initState() {
+    super.initState();
+    _ad.text = ref.read(ayarlarProvider).takmaAd;
+  }
 
   @override
   void dispose() {
@@ -165,6 +179,9 @@ class _OdaKatilDurum extends State<OdaKatilEkrani> {
       await odaOzeti(kod);
       final id = await installIdAl();
       if (!mounted) return;
+      if (_rol != 'display') {
+        unawaited(ref.read(ayarlarProvider.notifier).takmaAdKaydet(ad));
+      }
       context.pushReplacement(
         '/oda/$kod',
         extra: OdaGirisi(

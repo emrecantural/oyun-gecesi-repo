@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../app/premium.dart';
 import '../app/settings.dart';
@@ -33,7 +34,15 @@ class AyarlarEkrani extends ConsumerWidget {
             onSelectionChanged: (s) =>
                 ref.read(ayarlarProvider.notifier).temaSec(s.first),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Titreşim'),
+            value: ref.watch(ayarlarProvider.select((a) => a.titresim)),
+            onChanged: (v) =>
+                ref.read(ayarlarProvider.notifier).titresimiAyarla(v),
+          ),
+          const SizedBox(height: 16),
           Text('Premium', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           ListenableBuilder(
@@ -82,8 +91,56 @@ class AyarlarEkrani extends ConsumerWidget {
               child: const Text('Reklam gizlilik seçenekleri'),
             ),
           ],
+          const SizedBox(height: 24),
+          Text('Gizlilik ve yardım',
+              style: Theme.of(context).textTheme.titleMedium),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: const Text('Gizlilik'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () => context.push('/gizlilik'),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.delete_outline_rounded),
+            title: const Text('Yerel verilerimi sil'),
+            onTap: () => _sil(context, ref),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.info_outline_rounded),
+            title: const Text('Hakkında ve lisanslar'),
+            onTap: () => showLicensePage(
+              context: context,
+              applicationName: 'Oyun Gecesi',
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _sil(BuildContext context, WidgetRef ref) async {
+    final onay = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('Yerel veriler silinsin mi?'),
+        content: const Text(
+          'Tercihlerin ve cihaz kimliğin silinir, karşılama ekranına dönersin. Premium satın alımın Google Play hesabında durur; “Satın almayı geri yükle” ile geri getirebilirsin.',
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(c, false),
+              child: const Text('Vazgeç')),
+          FilledButton(
+              onPressed: () => Navigator.pop(c, true),
+              child: const Text('Sil')),
+        ],
+      ),
+    );
+    if (onay == true) {
+      await ref.read(ayarlarProvider.notifier).yerelVeriyiSil();
+    }
   }
 }

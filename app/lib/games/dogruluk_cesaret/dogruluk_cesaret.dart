@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -17,6 +16,7 @@ import '../../shell/ortak/oturum.dart';
 import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'tod_mantik.dart';
+import '../../platform/titresim.dart';
 
 const _dosya = '06-dogruluk-cesaret';
 
@@ -238,7 +238,7 @@ class _TodDurum extends ConsumerState<DogrulukCesaretEkrani>
   Future<void> _siseyiCevir() async {
     if (_doner) return;
     final id = _oyun.siraCek();
-    HapticFeedback.lightImpact();
+    Titresim.hafif();
     final idx = _oyun.durumlar.indexWhere((d) => d.oyuncu.id == id);
     final n = _oyun.durumlar.length;
     final hedef = 2 * math.pi * idx / n;
@@ -275,7 +275,7 @@ class _TodDurum extends ConsumerState<DogrulukCesaretEkrani>
       setState(() => _hata = 'Kartlar bitti.');
       return;
     }
-    HapticFeedback.lightImpact();
+    Titresim.hafif();
     if (otomatik) _bilgi = 'Süre doldu, Doğruluk seçildi.';
     setState(() {});
   }
@@ -289,7 +289,7 @@ class _TodDurum extends ConsumerState<DogrulukCesaretEkrani>
   void _tamam() {
     _sayac.durdur();
     _oyun.tamam();
-    HapticFeedback.mediumImpact();
+    Titresim.orta();
     _sonraki();
   }
 

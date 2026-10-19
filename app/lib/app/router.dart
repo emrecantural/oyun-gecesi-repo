@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../room/oda_ekranlari.dart';
 import '../room/oda_servisi.dart';
 import '../shell/ayarlar_ekrani.dart';
+import '../shell/gizlilik_ekrani.dart';
 import '../shell/oyun_detay_ekrani.dart';
 import '../shell/oyunlar_ekrani.dart';
 import '../shell/onboarding_ekrani.dart';
@@ -64,6 +65,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(path: '/ayarlar', builder: (_, _) => const AyarlarEkrani()),
+      GoRoute(path: '/gizlilik', builder: (_, _) => const GizlilikEkrani()),
     ],
   );
 });

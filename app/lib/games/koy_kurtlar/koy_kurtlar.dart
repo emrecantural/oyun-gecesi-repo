@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,6 +14,7 @@ import '../../shell/ortak/oturum.dart';
 import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'koy_mantik.dart';
+import '../../platform/titresim.dart';
 
 const _dosya = '03-koy-ve-kurtlar';
 
@@ -286,7 +286,7 @@ class _KoyDurum extends ConsumerState<KoyKurtlarEkrani> {
         _ => 'Bu seçim olmaz.',
       };
     }
-    HapticFeedback.lightImpact();
+    Titresim.hafif();
     setState(() {});
   }
 
@@ -499,7 +499,7 @@ class _KoyDurum extends ConsumerState<KoyKurtlarEkrani> {
     _avciId = s.avciBekliyor;
     _sonrasiOylama = false;
     _yenidenYapildi = false;
-    HapticFeedback.mediumImpact();
+    Titresim.orta();
     setState(() => _asama = _Asama.sabah);
   }
 

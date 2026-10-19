@@ -19,6 +19,7 @@ import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'alnim_mantik.dart';
 import 'egim.dart';
+import '../../platform/titresim.dart';
 
 const _dosya = '29-alnimdaki-kim';
 
@@ -219,7 +220,7 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
         t.cancel();
         _kalibrasyonuBekle();
       } else {
-        HapticFeedback.selectionClick();
+        Titresim.secim();
         setState(() => _geriSayim--);
       }
     });
@@ -286,7 +287,7 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
     }
     final ms = DateTime.now().difference(_kelimeBasi).inMilliseconds;
     _satirlar.add(KelimeSatiri(k.id, k.metin, s, ms));
-    HapticFeedback.mediumImpact();
+    Titresim.orta();
     if (s == Sonuc.dogru) {
       _flasGoster(context.renkler.nane, '✓ DOĞRU');
     } else {

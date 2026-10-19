@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,6 +12,7 @@ import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'casus_mantik.dart';
 import 'mekan_deposu.dart';
+import '../../platform/titresim.dart';
 
 final kimCasus = OyunUygulamasi(
   id: '02',
@@ -578,7 +578,7 @@ class _CasusDurum extends ConsumerState<KimCasusEkrani> {
     final voter = _oySirasi[_i];
     final sup = _p[oyun.suclananIdx!];
     void ver(bool evet) {
-      HapticFeedback.lightImpact();
+      Titresim.hafif();
       oyun.suclamaOyu(voter, evet);
       if (oyun.asama == CasusAsama.suclama) {
         setState(() {

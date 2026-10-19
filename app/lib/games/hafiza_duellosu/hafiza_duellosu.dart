@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,6 +10,7 @@ import '../../shell/ortak/oturum.dart';
 import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'hafiza_mantik.dart';
+import '../../platform/titresim.dart';
 
 const _yilbasi = <IconData>[
   Icons.ac_unit_rounded,
@@ -199,11 +199,11 @@ class _HafizaDurum extends ConsumerState<HafizaDuellosuEkrani>
     if (_asama != _Asama.oyun) return;
     final sonuc = _oyun.ac(idx);
     if (sonuc == HamleSonucu.reddedildi) return;
-    HapticFeedback.selectionClick();
+    Titresim.secim();
     _bilgi = null;
     switch (sonuc) {
       case HamleSonucu.eslesti:
-        HapticFeedback.mediumImpact();
+        Titresim.orta();
         final o = _oyun.oyuncular.firstWhere((e) => e.id == _oyun.kartlar[idx].sahip);
         _bilgi = o.seri >= 2 ? 'Seri x${o.seri}!' : 'Eşleşti!';
         setState(() {});

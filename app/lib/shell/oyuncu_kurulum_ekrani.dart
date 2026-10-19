@@ -54,15 +54,15 @@ class OyuncuKurulumEkrani extends ConsumerWidget {
     }
     final n = oyuncular.length;
     final yeter = n >= oyun.min;
-    final dolu = n >= oyun.max;
+    final dolu = n >= oyun.yerelMax;
     final r = context.renkler;
     final neden = n < oyun.min
         ? 'En az ${oyun.min} oyuncu gerekli.'
-        : (n > oyun.max ? 'Bu oyun en fazla ${oyun.max} kişiyle oynanır.' : null);
+        : (n > oyun.yerelMax ? 'Bu oyun en fazla ${oyun.yerelMax} kişiyle oynanır.' : null);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Kimler oynuyor?  $n / ${oyun.min}–${oyun.max}'),
+        title: Text('Kimler oynuyor?  $n / ${oyun.min}–${oyun.yerelMax}'),
       ),
       body: SafeArea(
         child: Column(
@@ -134,7 +134,7 @@ class OyuncuKurulumEkrani extends ConsumerWidget {
                           style: TextStyle(color: r.metinIkincil)),
                     ),
                   FilledButton(
-                    onPressed: yeter && n <= oyun.max
+                    onPressed: yeter && n <= oyun.yerelMax
                         ? () => context.push('/oyun/$oyunId/ayar')
                         : null,
                     child: const Text('Devam'),

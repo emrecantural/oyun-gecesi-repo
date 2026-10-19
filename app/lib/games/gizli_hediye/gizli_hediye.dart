@@ -13,6 +13,7 @@ import '../../shell/ortak/oturum.dart';
 import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'hediye_mantik.dart';
+import '../../platform/titresim.dart';
 
 const _dosya = '24-gizli-hediye-cekilisi';
 
@@ -155,7 +156,7 @@ class _HediyeDurum extends ConsumerState<GizliHediyeEkrani> {
       _cekiliyor = true;
       _hata = null;
     });
-    HapticFeedback.mediumImpact();
+    Titresim.orta();
     await Future<void>.delayed(const Duration(milliseconds: 1500));
     if (!mounted) return;
     try {

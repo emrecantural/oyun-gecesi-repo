@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -17,6 +16,7 @@ import '../../shell/ortak/oturum.dart';
 import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'dilsiz_mantik.dart';
+import '../../platform/titresim.dart';
 
 const _dosya = '09-dilsiz-sinema';
 
@@ -255,7 +255,7 @@ class _DilsizDurum extends ConsumerState<DilsizSinemaEkrani> {
     final o = _oge;
     if (o == null || _duraklat || !_dokunmaSerbest()) return;
     _oyun.dogru(o.id, o.metin);
-    HapticFeedback.mediumImpact();
+    Titresim.orta();
     _ogeCek();
     setState(() {});
     _snack('Doğru');
@@ -265,7 +265,7 @@ class _DilsizDurum extends ConsumerState<DilsizSinemaEkrani> {
     final o = _oge;
     if (o == null || _duraklat || !_oyun.pasVar || !_dokunmaSerbest()) return;
     _oyun.pas(o.id, o.metin);
-    HapticFeedback.selectionClick();
+    Titresim.secim();
     _ogeCek();
     setState(() {});
     _snack('Pas');

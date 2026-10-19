@@ -18,6 +18,7 @@ import '../../shell/ortak/oturum.dart';
 import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'quiz_mantik.dart';
+import '../../platform/titresim.dart';
 
 const _dosya = '15-bilgi-yarismasi';
 
@@ -286,7 +287,7 @@ class _QuizDurum extends ConsumerState<BilgiYarismasiEkrani> with WidgetsBinding
 
   void _ortakSec(int oyuncuId, int secim) {
     if (_asama != _Asama.cevap || _m.yanitladi(oyuncuId)) return;
-    HapticFeedback.selectionClick();
+    Titresim.secim();
     _m.cevapla(oyuncuId, secim, _sayac.kalanMs);
     if (_p.every((p) => _m.yanitladi(p.id))) {
       _ortakBitir();
@@ -319,7 +320,7 @@ class _QuizDurum extends ConsumerState<BilgiYarismasiEkrani> with WidgetsBinding
     if (_asama != _Asama.cevap) return;
     final kalan = _sayac.kalanMs;
     _sayac.durdur();
-    HapticFeedback.selectionClick();
+    Titresim.secim();
     final id = _sira[_siraIdx];
     if (secim != null) _m.cevapla(id, secim, kalan, jokerli: _jokerli);
     setState(() => _asama = _Asama.kilit);

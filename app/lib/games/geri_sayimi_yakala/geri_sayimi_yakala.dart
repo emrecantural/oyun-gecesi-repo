@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -10,6 +9,7 @@ import '../../shell/ortak/oturum.dart';
 import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'gys_mantik.dart';
+import '../../platform/titresim.dart';
 
 final geriSayimiYakala = OyunUygulamasi(
   id: '18',
@@ -159,7 +159,7 @@ class _GysDurum extends ConsumerState<GeriSayimiYakalaEkrani>
       if (_bolgeBasili.values.where((v) => v > 0).length == _oyuncular.length) {
         _hepsiAyniAnda = true;
       }
-      HapticFeedback.selectionClick();
+      Titresim.secim();
       setState(() {});
       return;
     }
@@ -171,7 +171,7 @@ class _GysDurum extends ConsumerState<GeriSayimiYakalaEkrani>
     final id = _oyuncular[bolge].id;
     if (_sapma.containsKey(id)) return; // SECOND_TOUCH
     _sapma[id] = (e.timeStamp - hedef).inMicroseconds / 1000.0;
-    HapticFeedback.lightImpact();
+    Titresim.hafif();
     setState(() {});
     if (_sapma.length == _oyuncular.length) _kapatmayiPlanla();
   }
@@ -208,7 +208,7 @@ class _GysDurum extends ConsumerState<GeriSayimiYakalaEkrani>
     if (!_hedefGecti && ms >= _hedefSn * 1000) {
       _hedefGecti = true;
       _asama = _Asama.kapat;
-      HapticFeedback.mediumImpact();
+      Titresim.orta();
       _kapatmayiPlanla(sureMs: _kapatMs);
     }
     setState(() {});
@@ -237,7 +237,7 @@ class _GysDurum extends ConsumerState<GeriSayimiYakalaEkrani>
       for (final o in _oyuncular) o.id: _sapma[o.id],
     });
     _asama = _Asama.reveal;
-    HapticFeedback.mediumImpact();
+    Titresim.orta();
     setState(() {});
   }
 

@@ -4,19 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../app/settings.dart';
 import '../app/theme.dart';
 
-/// M01–M02a: karşılama ve gizlilik bilgisi. Analitik kutusu varsayılan KAPALI.
-class OnboardingEkrani extends ConsumerStatefulWidget {
+/// M01–M02a: karşılama ve gizlilik bilgisi. Toplanmayan veri için onay kutusu yoktur.
+class OnboardingEkrani extends ConsumerWidget {
   const OnboardingEkrani({super.key});
 
   @override
-  ConsumerState<OnboardingEkrani> createState() => _OnboardingEkraniState();
-}
-
-class _OnboardingEkraniState extends ConsumerState<OnboardingEkrani> {
-  bool _analitik = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final r = context.renkler;
     return Scaffold(
       body: SafeArea(
@@ -46,16 +39,10 @@ class _OnboardingEkraniState extends ConsumerState<OnboardingEkrani> {
                     ?.copyWith(color: r.metinIkincil),
               ),
               const Spacer(),
-              Card(
-                child: CheckboxListTile(
-                  value: _analitik,
-                  onChanged: (v) => setState(() => _analitik = v ?? false),
-                  title: const Text('Anonim kullanım ve hata verisi paylaş'),
-                  subtitle: const Text(
-                    'İsteğe bağlı. Kapalıysa hiçbir analitik verisi toplanmaz. Ayarlardan değiştirebilirsin.',
-                  ),
-                  controlAffinity: ListTileControlAffinity.leading,
-                ),
+              Text(
+                'Hesap yok, analitik yok. Tercihlerin cihazında kalır; çevrimiçi odada takma adın ve rastgele cihaz kimliğin paylaşılır. Ayrıntılar Ayarlar > Gizlilik’te.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: r.metinIkincil),
               ),
               const SizedBox(height: 16),
               FilledButton(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,6 +14,7 @@ import '../../shell/ortak/oturum.dart';
 import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'tanis_mantik.dart';
+import '../../platform/titresim.dart';
 
 const _dosya = '14-birbirimizi-taniyoruz';
 
@@ -172,7 +172,7 @@ class _TanisDurum extends ConsumerState<BirbirimiziTaniyoruzEkrani> {
     if (_kilitli) return;
     _kilitli = true;
     _sayac.durdur();
-    HapticFeedback.selectionClick();
+    Titresim.secim();
     final b = _blok!;
     final ms = DateTime.now().difference(_soruBasi).inMilliseconds;
     if (_asama == _Asama.odakSoru) {

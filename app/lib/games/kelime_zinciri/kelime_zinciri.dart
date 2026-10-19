@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,6 +13,7 @@ import '../../shell/ortak/oturum.dart';
 import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'zincir_mantik.dart';
+import '../../platform/titresim.dart';
 
 const _dosya = '13-kelime-zinciri';
 
@@ -175,7 +175,7 @@ class _ZincirDurum extends ConsumerState<KelimeZinciriEkrani> {
   }
 
   void _sureDoldu() {
-    HapticFeedback.heavyImpact();
+    Titresim.agir();
     _sureDolduydu = true;
     _onayBasla(_Asama.sureDoldu);
   }

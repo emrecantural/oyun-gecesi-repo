@@ -17,6 +17,7 @@ import '../../shell/ortak/oturum.dart';
 import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'yk_mantik.dart';
+import '../../platform/titresim.dart';
 
 const _dosya = '10-yasak-kelime';
 const _dosyaYilbasi = '10-yasak-kelime-yilbasi';
@@ -148,7 +149,7 @@ class _YkDurum extends ConsumerState<YasakKelimeEkrani> {
   }
 
   void _hazir() {
-    HapticFeedback.mediumImpact();
+    Titresim.orta();
     SystemChrome.setPreferredOrientations(const [
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
@@ -203,7 +204,7 @@ class _YkDurum extends ConsumerState<YasakKelimeEkrani> {
       return;
     }
     if (!ok) return;
-    HapticFeedback.mediumImpact();
+    Titresim.orta();
     _kartCek();
     setState(() {});
     final m = ScaffoldMessenger.of(context);

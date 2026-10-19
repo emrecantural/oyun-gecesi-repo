@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,6 +13,7 @@ import '../../content/icerik_deposu.dart';
 import '../../shell/ortak/oturum.dart';
 import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
+import '../../platform/titresim.dart';
 
 const _dosya = '27-gece-yarisi-sorgusu';
 
@@ -123,7 +123,7 @@ class _GeceDurum extends ConsumerState<GeceYarisiSorgusuEkrani>
   }
 
   void _kartiAc() {
-    HapticFeedback.lightImpact();
+    Titresim.hafif();
     final d = _deste!;
     _kart = d.cek();
     _n++;

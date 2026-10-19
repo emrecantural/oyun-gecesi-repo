@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,6 +11,7 @@ import '../../content/icerik_deposu.dart';
 import '../../core/sure_sayaci.dart';
 import '../../shell/ortak/oturum.dart';
 import '../oyun_uygulamasi.dart';
+import '../../platform/titresim.dart';
 
 const _dosya = '07-en-olasi-kim';
 
@@ -117,7 +117,7 @@ class _EokDurum extends ConsumerState<EnOlasiKimEkrani> {
   }
 
   void _hazir() {
-    HapticFeedback.lightImpact();
+    Titresim.hafif();
     _asama = _Asama.dusunme;
     _sayac.baslat(_o.ayarInt('dusun') * 1000, bitince: _geriSayimBaslat);
     setState(() {});
@@ -130,7 +130,7 @@ class _EokDurum extends ConsumerState<EnOlasiKimEkrani> {
   }
 
   void _goster() {
-    HapticFeedback.heavyImpact();
+    Titresim.agir();
     _asama = _Asama.goster;
     setState(() {});
   }

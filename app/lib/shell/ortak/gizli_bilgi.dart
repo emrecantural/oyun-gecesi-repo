@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../app/theme.dart';
 import '../../platform/secure_screen.dart';
 import 'oyuncular.dart';
+import '../../platform/titresim.dart';
 
 /// Gizli bilgi gösteren ekranı sarar: açıkken FLAG_SECURE etkindir.
 class GizliEkran extends StatefulWidget {
@@ -175,7 +175,7 @@ class _BasiliTutKartDurum extends State<BasiliTutKart>
   void _goster() {
     if (_gorunur) return;
     setState(() => _gorunur = true);
-    HapticFeedback.lightImpact();
+    Titresim.hafif();
     widget.acildi?.call();
     _azami?.cancel();
     _azami = Timer(Duration(seconds: widget.azamiAcikSn), _gizle);

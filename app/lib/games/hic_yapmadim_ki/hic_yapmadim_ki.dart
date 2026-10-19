@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -14,6 +13,7 @@ import '../../shell/ortak/oturum.dart';
 import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'hy_mantik.dart';
+import '../../platform/titresim.dart';
 
 const _dosya = '05-hic-yapmadim-ki';
 
@@ -159,7 +159,7 @@ class _HyDurum extends ConsumerState<HicYapmadimKiEkrani> {
           ? 'Havuz yenilendi.'
           : 'Ücretsiz kartlar bitti. Premium\'da tam içerik var.';
     }
-    HapticFeedback.lightImpact();
+    Titresim.hafif();
     _sayac.baslat(4000, bitince: _kartBitti);
     setState(() {});
   }
@@ -182,7 +182,7 @@ class _HyDurum extends ConsumerState<HicYapmadimKiEkrani> {
   }
 
   void _sonucZamani() {
-    HapticFeedback.mediumImpact();
+    Titresim.orta();
     _sayac.baslat(5000, bitince: _sonucBitti);
   }
 
@@ -437,7 +437,7 @@ class _HyDurum extends ConsumerState<HicYapmadimKiEkrani> {
           ? const Icon(Icons.check_rounded)
           : (isaret == HyIsaret.pas ? const Icon(Icons.block_rounded) : null),
       onTap: () {
-        HapticFeedback.lightImpact();
+        Titresim.hafif();
         setState(() => _oyun.isaretDegistir(o.id));
       },
     ).semanticsEk('Durum: $isaretMetin. Değiştirmek için çift dokun');
