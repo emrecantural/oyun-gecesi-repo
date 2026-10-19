@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/theme.dart';
-import '../../content/icerik.dart';
 import '../../content/icerik_deposu.dart';
 import '../../core/sure_sayaci.dart';
 import '../../core/tr_text.dart';
