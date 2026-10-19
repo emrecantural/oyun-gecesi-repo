@@ -5,6 +5,9 @@ import '../shell/ayarlar_ekrani.dart';
 import '../shell/oyun_detay_ekrani.dart';
 import '../shell/oyunlar_ekrani.dart';
 import '../shell/onboarding_ekrani.dart';
+import '../shell/oyna_ekrani.dart';
+import '../shell/oyun_ayar_ekrani.dart';
+import '../shell/oyuncu_kurulum_ekrani.dart';
 import 'settings.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -25,6 +28,23 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/oyun/:id',
         builder: (_, state) =>
             OyunDetayEkrani(oyunId: state.pathParameters['id']!),
+        routes: [
+          GoRoute(
+            path: 'oyuncular',
+            builder: (_, state) =>
+                OyuncuKurulumEkrani(oyunId: state.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: 'ayar',
+            builder: (_, state) =>
+                OyunAyarEkrani(oyunId: state.pathParameters['id']!),
+          ),
+          GoRoute(
+            path: 'oyna',
+            builder: (_, state) =>
+                OynaEkrani(oyunId: state.pathParameters['id']!),
+          ),
+        ],
       ),
       GoRoute(path: '/ayarlar', builder: (_, _) => const AyarlarEkrani()),
     ],

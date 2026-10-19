@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../app/theme.dart';
+import '../games/oyun_uygulamalari.dart';
 import '../games/registry.dart';
 
 /// M06: oyun detayı. Oynatma henüz bağlı değil; düğme "Yakında".
@@ -42,10 +44,16 @@ class OyunDetayEkrani extends StatelessWidget {
                 ],
               ),
               const Spacer(),
-              const FilledButton(
-                onPressed: null,
-                child: Text('Yakında'),
-              ),
+              if (oyunUygulamasi(oyun.id) != null && !oyun.sadeceOda)
+                FilledButton(
+                  onPressed: () => context.push('/oyun/${oyun.id}/oyuncular'),
+                  child: const Text('Bu cihazda oyna'),
+                )
+              else
+                const FilledButton(
+                  onPressed: null,
+                  child: Text('Yakında'),
+                ),
             ],
           ),
         ),
