@@ -165,7 +165,7 @@ export class Oda {
       ready: false,
       seenIds: [],
       shape: sira % 6,
-      color: sira % 8,
+      color: sira % 12,
       joinedAt: this.dep.now(),
       disconnectedAt: null,
     };
