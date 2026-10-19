@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../app/premium.dart';
 import '../app/theme.dart';
 import '../games/registry.dart';
 import '../platform/secure_screen.dart';
@@ -23,15 +25,15 @@ const odaOyunlari = {'01', '03', '07'};
 const _minOyuncu = {'01': 2, '03': 6, '07': 3};
 
 /// Oda kur: takma ad → sunucuda oda → odaya gir.
-class OdaKurEkrani extends StatefulWidget {
+class OdaKurEkrani extends ConsumerStatefulWidget {
   const OdaKurEkrani({super.key, required this.oyunId});
   final String oyunId;
 
   @override
-  State<OdaKurEkrani> createState() => _OdaKurDurum();
+  ConsumerState<OdaKurEkrani> createState() => _OdaKurDurum();
 }
 
-class _OdaKurDurum extends State<OdaKurEkrani> {
+class _OdaKurDurum extends ConsumerState<OdaKurEkrani> {
   final _ad = TextEditingController();
   bool _mesgul = false;
   String? _hata;
@@ -54,7 +56,12 @@ class _OdaKurDurum extends State<OdaKurEkrani> {
     });
     try {
       final id = await installIdAl();
-      final giris = await odaKur(oyunId: widget.oyunId, takmaAd: ad, installId: id);
+      final giris = await odaKur(
+        oyunId: widget.oyunId,
+        takmaAd: ad,
+        installId: id,
+        premium: ref.read(premiumProvider),
+      );
       if (!mounted) return;
       context.pushReplacement('/oda/${giris.kod}', extra: giris);
     } on OdaHatasi catch (e) {

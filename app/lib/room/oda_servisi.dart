@@ -120,12 +120,14 @@ Future<OdaGirisi> odaKur({
   required String takmaAd,
   required String installId,
   Map<String, dynamic>? ayarlar,
+  bool premium = false,
 }) async {
   final j = await _istek('POST', '/v1/rooms', {
     'game': oyunId,
     'nickname': takmaAd,
     'installId': installId,
     'settings': ?ayarlar,
+    'premium': premium,
   });
   final kod = j['code'] as String;
   return OdaGirisi(
