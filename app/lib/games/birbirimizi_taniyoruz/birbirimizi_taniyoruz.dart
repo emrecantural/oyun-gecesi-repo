@@ -142,6 +142,7 @@ class _TanisDurum extends ConsumerState<BirbirimiziTaniyoruzEkrani> {
     final sorular = <TanisSoru>[];
     for (var i = 0; i < _soruAdedi; i++) {
       final s = d.cek();
+      if (s == null) continue;
       sorular.add(TanisSoru(s.id, s.metin, s.ek.split('|')));
     }
     _gecmis.gorulenleriKaydet('14', d.gorulen);
