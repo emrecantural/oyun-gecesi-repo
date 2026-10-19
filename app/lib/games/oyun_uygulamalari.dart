@@ -1,3 +1,4 @@
+import 'alnimdaki_kim/alnimdaki_kim.dart';
 import 'dogruluk_cesaret/dogruluk_cesaret.dart';
 import 'en_olasi_kim/en_olasi_kim.dart';
 import 'gece_yarisi_sorgusu/gece_yarisi_sorgusu.dart';
@@ -18,6 +19,7 @@ final Map<String, OyunUygulamasi> _uygulamalar = {
   kimCasus.id: kimCasus,
   geceYarisiSorgusu.id: geceYarisiSorgusu,
   yeniYilKehaneti.id: yeniYilKehaneti,
+  alnimdakiKim.id: alnimdakiKim,
 };
 
 OyunUygulamasi? oyunUygulamasi(String id) => _uygulamalar[id];
