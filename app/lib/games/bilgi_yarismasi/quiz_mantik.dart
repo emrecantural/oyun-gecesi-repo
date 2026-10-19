@@ -150,6 +150,9 @@ class QuizMotoru {
     return SoruSonucu(dagilim, puanlar);
   }
 
+  /// Kesinti: bu sorunun alınmış cevapları puanlanmadan atılır (soruyu yenile).
+  void cevaplariSil() => _cevaplar.clear();
+
   void sonraki() => soruNo++;
 
   List<QuizOyuncu> sira() {

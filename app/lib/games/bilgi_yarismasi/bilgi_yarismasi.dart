@@ -84,7 +84,7 @@ class BilgiYarismasiEkrani extends ConsumerStatefulWidget {
   ConsumerState<BilgiYarismasiEkrani> createState() => _QuizDurum();
 }
 
-class _QuizDurum extends ConsumerState<BilgiYarismasiEkrani> {
+class _QuizDurum extends ConsumerState<BilgiYarismasiEkrani> with WidgetsBindingObserver {
   final _gecmis = GecmisDeposu();
   final _sayac = SureSayaci();
   final _rng = Random();
@@ -121,9 +121,67 @@ class _QuizDurum extends ConsumerState<BilgiYarismasiEkrani> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _sayac.addListener(_yenile);
     _kur();
   }
+
+  // ---- Kesinti (D-046 K-04): CEVAP'ta arka plana alınırsa süre akar; dönüşte ≥2 sn ise banner ----
+  DateTime? _arkaPlanBasi;
+  bool _kesinti = false;
+  Timer? _kesintiT;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+      _arkaPlanBasi ??= DateTime.now();
+    } else if (state == AppLifecycleState.resumed) {
+      final bas = _arkaPlanBasi;
+      _arkaPlanBasi = null;
+      if (bas != null &&
+          _asama == _Asama.cevap &&
+          DateTime.now().difference(bas) >= const Duration(seconds: 2)) {
+        _kesintiT?.cancel();
+        setState(() => _kesinti = true);
+        _kesintiT = Timer(const Duration(seconds: 5), () {
+          if (mounted) setState(() => _kesinti = false);
+        });
+      }
+    }
+  }
+
+  void _kesintiyiYenile() {
+    _kesintiT?.cancel();
+    _kesinti = false;
+    _sayac.durdur();
+    if (_ortak) {
+      // Yeni soru; eskisi puanlanmaz ve soru sayısı artmaz.
+      _m.cevaplariSil();
+      _soruHazirla();
+    } else {
+      // Aynı oyuncu aynı soruyu yeniden yanıtlar.
+      _oyuncuBasla();
+    }
+  }
+
+  Widget _kesintiBandi() => Positioned(
+        left: 16,
+        right: 16,
+        top: 8,
+        child: Material(
+          color: context.renkler.uyari,
+          borderRadius: BorderRadius.circular(12),
+          child: ListTile(
+            title: Text(_ortak
+                ? 'Arka plana alındı.'
+                : '${_oyuncu(_sira[_siraIdx]).ad} yeniden yanıtlasın?'),
+            trailing: TextButton(
+              onPressed: _kesintiyiYenile,
+              child: Text(_ortak ? 'Soruyu yenile' : 'Yeniden yanıtla'),
+            ),
+          ),
+        ),
+      );
 
   void _yenile() {
     if (mounted) setState(() {});
@@ -131,6 +189,8 @@ class _QuizDurum extends ConsumerState<BilgiYarismasiEkrani> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _kesintiT?.cancel();
     _zamanlayici?.cancel();
     _sayac.removeListener(_yenile);
     _sayac.dispose();
@@ -355,7 +415,13 @@ class _QuizDurum extends ConsumerState<BilgiYarismasiEkrani> {
       _Asama.esitlik => _esitlik(),
       _Asama.final_ => _final(),
     };
-    return Container(color: context.renkler.zemin, child: govde);
+    return Container(
+      color: context.renkler.zemin,
+      child: Stack(children: [
+        Positioned.fill(child: govde),
+        if (_kesinti && _asama == _Asama.cevap) _kesintiBandi(),
+      ]),
+    );
   }
 
   Widget _baslikSatiri() => Text(

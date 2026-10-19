@@ -101,6 +101,7 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
   final List<KelimeSatiri> _satirlar = [];
   DateTime _kelimeBasi = DateTime.now();
   int _geriSayim = 3;
+  bool _kalibreBekliyor = false;
   Timer? _gsTimer;
   EgimTespitcisi? _egim;
   StreamSubscription<AccelerometerEvent>? _egimAbone;
@@ -204,6 +205,7 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
   void _hazirlikBaslat() {
     _egimBaslat();
     _geriSayim = 3;
+    _kalibreBekliyor = false;
     _asama = _Asama.hazirlik;
     setState(() {});
     SystemChrome.setPreferredOrientations(const [
@@ -215,10 +217,31 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
       if (!mounted) return t.cancel();
       if (_geriSayim <= 1) {
         t.cancel();
-        _turBaslat();
+        _kalibrasyonuBekle();
       } else {
         HapticFeedback.selectionClick();
         setState(() => _geriSayim--);
+      }
+    });
+  }
+
+  /// 3-2-1 bitti ama eğim henüz kalibre değilse en çok 10 sn (hazırlık başından) bekler;
+  /// sonra Düğme Moduna düşer (tasarım §3: "kalibrasyon 10 sn'de başarısızsa").
+  void _kalibrasyonuBekle() {
+    final e = _egim;
+    if (_o.ayar('giris') != 'egim' || e == null || e.hazir) {
+      _turBaslat();
+      return;
+    }
+    setState(() => _kalibreBekliyor = true);
+    final bas = DateTime.now();
+    _gsTimer = Timer.periodic(const Duration(milliseconds: 200), (t) {
+      if (!mounted) return t.cancel();
+      final gecen = DateTime.now().difference(bas).inMilliseconds + 3000;
+      if (e.hazir || gecen >= 10000) {
+        t.cancel();
+        _kalibreBekliyor = false;
+        _turBaslat();
       }
     });
   }
@@ -401,8 +424,12 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text('Telefonu alnına tut…', style: TextStyle(fontSize: 22)),
-            Text('$_geriSayim',
-                style: const TextStyle(fontSize: 96, fontWeight: FontWeight.w900)),
+            if (_kalibreBekliyor)
+              const Text('Telefonu sabit tut…',
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900))
+            else
+              Text('$_geriSayim',
+                  style: const TextStyle(fontSize: 96, fontWeight: FontWeight.w900)),
           ],
         ),
       );

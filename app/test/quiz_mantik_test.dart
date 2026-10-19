@@ -65,4 +65,14 @@ void main() {
     expect(QuizMotoru.yakinKazananlar({1: 90, 2: 110}, 100), [1, 2]);
     expect(QuizMotoru.yakinKazananlar({1: 95, 2: 140}, 100), [1]);
   });
+
+  test('kesinti: cevaplariSil puanlamadan atar', () {
+    final m = QuizMotoru(oyuncuIdleri: [1, 2], soruSayisi: 3, toplamMs: 10000);
+    m.cevapla(1, soru().dogru, 8000);
+    m.cevaplariSil();
+    expect(m.yanitladi(1), isFalse);
+    final r = m.soruyuBitir(soru());
+    expect(r.puanlar.values.every((p) => p == 0), isTrue);
+    expect(m.oyuncular[1]!.puan, 0);
+  });
 }
