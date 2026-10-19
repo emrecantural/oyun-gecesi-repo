@@ -4,6 +4,7 @@ import {
   GECIS_SURESI_MS,
   GecisDefteri,
   gecisBozdur,
+  kurulumuSil,
   kimlikOzeti,
   URUN_ID,
   type Depo,
@@ -18,6 +19,9 @@ class BellekDepo implements Depo {
   }
   async put(k: string, v: unknown) {
     this.m.set(k, structuredClone(v));
+  }
+  async delete(k: string) {
+    return this.m.delete(k);
   }
 }
 
@@ -119,4 +123,14 @@ test('geçiş başka kuruluma ait olamaz; 30 gün bekleyen geçiş süresi dolar
 
 test('kimlik özeti SHA-256 vektörü (istemci ile aynı)', () => {
   assert.equal(kimlikOzeti('abc'), 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
+});
+
+test('kurulum silme: deneme kaydı kalkar, geçersiz kimlik 400', async () => {
+  const d = new GecisDefteri(new BellekDepo());
+  const i = kimlikOzeti(KIMLIK);
+  await d.kullan('deneme', undefined, i);
+  assert.equal(await d.bak(undefined, i), null);
+  assert.equal((await kurulumuSil({ installId: KIMLIK }, d)).status, 200);
+  assert.equal(await d.bak(undefined, i), 'deneme');
+  assert.equal((await kurulumuSil({ installId: 'x' }, d)).status, 400);
 });

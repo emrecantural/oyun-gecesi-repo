@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../platform/titresim.dart';
+import '../room/oda_servisi.dart';
 
 class Ayarlar {
   const Ayarlar({
@@ -93,6 +94,8 @@ class AyarlarNotifier extends Notifier<Ayarlar> {
 
   /// Cihazdaki tüm yerel tercihleri ve kimliği siler; karşılama ekranına döner.
   Future<void> yerelVeriyiSil() async {
+    // Önce sunucu kaydı (kimlik silinmeden); sunucuya ulaşılamazsa yerel silme yine yapılır.
+    await kurulumuSunucudanSil(await installIdAl());
     try {
       await SharedPreferencesAsync().clear();
     } catch (_) {}

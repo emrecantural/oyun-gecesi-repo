@@ -6,6 +6,7 @@ import '../app/premium.dart';
 import '../app/settings.dart';
 import '../monetization/reklam_servisi.dart';
 import '../monetization/satin_alma.dart';
+import 'kural_kartlari.dart';
 
 class AyarlarEkrani extends ConsumerWidget {
   const AyarlarEkrani({super.key});
@@ -41,6 +42,18 @@ class AyarlarEkrani extends ConsumerWidget {
             value: ref.watch(ayarlarProvider.select((a) => a.titresim)),
             onChanged: (v) =>
                 ref.read(ayarlarProvider.notifier).titresimiAyarla(v),
+          ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Kural kartlarını yeniden göster'),
+            onTap: () async {
+              await kurallariSifirla();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Kural kartları yeniden gösterilecek.')),
+                );
+              }
+            },
           ),
           const SizedBox(height: 16),
           Text('Premium', style: Theme.of(context).textTheme.titleMedium),

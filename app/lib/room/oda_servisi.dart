@@ -98,7 +98,7 @@ Future<Map<String, dynamic>> _istek(String metod, String yol, [Object? govde]) a
   final istemci = HttpClient()..connectionTimeout = const Duration(seconds: 8);
   try {
     final uri = taban.replace(path: yol);
-    final r = await (metod == 'POST' ? istemci.postUrl(uri) : istemci.getUrl(uri)).timeout(const Duration(seconds: 8));
+    final r = await istemci.openUrl(metod, uri).timeout(const Duration(seconds: 8));
     if (govde != null) {
       r.headers.contentType = ContentType.json;
       r.write(jsonEncode(govde));
@@ -147,6 +147,14 @@ Future<OdaGirisi> odaKur({
     installId: installId,
     resumeToken: j['joinToken'] as String?,
   );
+}
+
+/// Sunucudaki kurulum kaydını (ücretsiz deneme işareti) siler; en iyi çabayla, hata yutulur.
+Future<void> kurulumuSunucudanSil(String installId) async {
+  if (!sunucuAyarli) return;
+  try {
+    await _istek('DELETE', '/v1/installs', {'installId': installId});
+  } catch (_) {}
 }
 
 /// Doğrulanmış Play satın almasını sunucuda 4 saatlik geçişe çevirir; geçiş kimliğini döner.

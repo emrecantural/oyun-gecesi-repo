@@ -2,7 +2,7 @@ import { odaKodu, guvenliRand } from './core/rng.ts';
 import { oyunTanimi } from './games/index.ts';
 import type { Env } from './odaNesnesi.ts';
 
-import { gecisBozdur, kimlikOzeti } from './gecis.ts';
+import { gecisBozdur, kimlikOzeti, kurulumuSil } from './gecis.ts';
 import { GooglePlay } from './play.ts';
 
 export { OdaNesnesi } from './odaNesnesi.ts';
@@ -84,6 +84,18 @@ export default {
       }
       const defter = env.GECIS.get(env.GECIS.idFromName('defter'));
       const y = await gecisBozdur(g, new GooglePlay(env.PLAY_HIZMET_HESABI, env.PLAY_PAKET), defter);
+      return json(y.body, y.status);
+    }
+
+    if (yol === '/v1/installs' && request.method === 'DELETE') {
+      let g: Record<string, unknown>;
+      try {
+        g = (await request.json()) as Record<string, unknown>;
+      } catch {
+        return json({ error: 'INVALID_MESSAGE' }, 400);
+      }
+      const defter = env.GECIS.get(env.GECIS.idFromName('defter'));
+      const y = await kurulumuSil(g, defter);
       return json(y.body, y.status);
     }
 

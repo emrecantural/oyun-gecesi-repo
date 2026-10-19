@@ -12,6 +12,9 @@ export class GecisNesnesi extends DurableObject<Env> {
   bak(passId: string | undefined, installOzeti: string): Promise<OdaHakki> {
     return this.defter.bak(passId, installOzeti);
   }
+  unut(installOzeti: string): Promise<void> {
+    return this.defter.unut(installOzeti);
+  }
   kullan(hak: OdaHakki, passId: string | undefined, installOzeti: string): Promise<void> {
     return this.defter.kullan(hak, passId, installOzeti);
   }

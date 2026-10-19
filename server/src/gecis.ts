@@ -10,6 +10,7 @@ export const BEKLEME_MS = 30 * 24 * 3600_000;
 export interface Depo {
   get<T>(anahtar: string): Promise<T | undefined>;
   put(anahtar: string, deger: unknown): Promise<void>;
+  delete(anahtar: string): Promise<unknown>;
 }
 
 export interface SatinAlma {
@@ -74,6 +75,11 @@ export class GecisDefteri {
     return null;
   }
 
+  /** Kurulumun ücretsiz deneme kaydını siler. Geçiş (satın alma) kayıtları mali kayıt olarak kalır; yalnız özet içerir. */
+  async unut(installOzeti: string): Promise<void> {
+    await this.depo.delete(`d:${installOzeti}`);
+  }
+
   async kullan(hak: OdaHakki, passId: string | undefined, installOzeti: string): Promise<void> {
     if (hak === 'pass' && passId) {
       const k = await this.depo.get<GecisKaydi>(`p:${passId}`);
@@ -85,6 +91,19 @@ export class GecisDefteri {
       await this.depo.put(`d:${installOzeti}`, true);
     }
   }
+}
+
+/** DELETE /v1/installs iş akışı: kurulum kimliği doğrulanır, sunucudaki kaydı silinir. */
+export async function kurulumuSil(
+  girdi: { installId?: unknown },
+  defter: Pick<GecisDefteri, 'unut'>,
+): Promise<Yanit> {
+  const kimlik = girdi.installId;
+  if (typeof kimlik !== 'string' || kimlik.length < 8 || kimlik.length > 64) {
+    return { status: 400, body: { error: 'INVALID_MESSAGE' } };
+  }
+  await defter.unut(kimlikOzeti(kimlik));
+  return { status: 200, body: { ok: true } };
 }
 
 export interface RedeemGirdi {

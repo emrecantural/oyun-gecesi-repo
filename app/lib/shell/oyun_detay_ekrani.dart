@@ -6,6 +6,7 @@ import '../games/oyun_uygulamalari.dart';
 import '../games/registry.dart';
 import '../monetization/reklam_servisi.dart';
 import '../room/oda_ekranlari.dart';
+import 'kural_kartlari.dart';
 
 /// M06: oyun detayı.
 class OyunDetayEkrani extends StatelessWidget {
@@ -43,13 +44,20 @@ class OyunDetayEkrani extends StatelessWidget {
                 children: [
                   Chip(label: Text(oyun.kategori.ad)),
                   Chip(label: Text(oyun.kisiAraligi)),
+                  Chip(label: Text(oyun.sureYazi)),
                   if (oyun.sadeceOda) const Chip(label: Text('Sadece oda')),
                 ],
               ),
               const Spacer(),
+              if (kuralKartlari.containsKey(oyun.id))
+                TextButton.icon(
+                  onPressed: () => kuralSheetiGoster(context, oyun),
+                  icon: const Icon(Icons.menu_book_rounded),
+                  label: const Text('Nasıl oynanır?'),
+                ),
               if (oyunUygulamasi(oyun.id) != null && !oyun.sadeceOda)
                 FilledButton(
-                  onPressed: () => context.push('/oyun/${oyun.id}/oyuncular'),
+                  onPressed: () => _yerelBaslat(context, oyun),
                   child: const Text('Bu cihazda oyna'),
                 ),
               if (odaOyunlari.contains(oyun.id)) ...[
@@ -70,5 +78,14 @@ class OyunDetayEkrani extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _yerelBaslat(BuildContext context, OyunBilgisi oyun) async {
+    final yol = '/oyun/${oyun.id}/oyuncular';
+    if (!await kuralGizliMi(oyun.id)) {
+      if (!context.mounted) return;
+      if (!await kuralSheetiGoster(context, oyun, oyunaGec: true)) return;
+    }
+    if (context.mounted) context.push(yol);
   }
 }
