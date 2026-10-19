@@ -71,14 +71,43 @@ final dilsizSinema = OyunUygulamasi(
       gelismis: true,
     ),
   ],
-  ekran: (context, oturum) => DilsizSinemaEkrani(oturum: oturum),
+  ekran: (context, oturum) => DilsizSinemaEkrani(
+    oturum: oturum,
+    yap: const DilsizYapilandirma(
+      oyunKodu: '09',
+      dosya: _dosya,
+      ogeTur: 'oge',
+      rozet: 'Mimik Ustası',
+    ),
+  ),
 );
+
+/// 09 ve 25 aynı tur motorunu paylaşır; farklar burada.
+class DilsizYapilandirma {
+  const DilsizYapilandirma({
+    required this.oyunKodu,
+    required this.dosya,
+    required this.ogeTur,
+    required this.rozet,
+    this.ifadeli = false,
+    this.hazirIpucu = 'Ekranı kendine çevir. Konuşmak ve harf göstermek yasak.',
+  });
+  final String oyunKodu;
+  final String dosya;
+  final String ogeTur;
+  final String rozet;
+  final bool ifadeli;
+  final String hazirIpucu;
+}
+
+const ifadeAdlari = {'mirildan': '♪ Mırıldan', 'islik': '〰 Islık', 'tempo': '👏 Tempo'};
 
 enum _Asama { yukleniyor, sira, geriSayim, tur, ozet, skor, final_ }
 
 class DilsizSinemaEkrani extends ConsumerStatefulWidget {
-  const DilsizSinemaEkrani({super.key, required this.oturum});
+  const DilsizSinemaEkrani({super.key, required this.oturum, required this.yap});
   final OyunOturumu oturum;
+  final DilsizYapilandirma yap;
 
   @override
   ConsumerState<DilsizSinemaEkrani> createState() => _DilsizDurum();
@@ -103,6 +132,9 @@ class _DilsizDurum extends ConsumerState<DilsizSinemaEkrani> {
   int _sonDokunma = -1000;
 
   OyunOturumu get _o => widget.oturum;
+  DilsizYapilandirma get _y => widget.yap;
+  final List<String> _ifadeler = []; // tur sırasına göre
+  String _ifade = 'mirildan';
   List<Oyuncu> get _p => _o.oyuncular;
   Oyuncu _oyuncu(int id) => _p.firstWhere((p) => p.id == id);
   String _takimAdi(int t) => 'Takım ${t + 1}';
@@ -135,13 +167,13 @@ class _DilsizDurum extends ConsumerState<DilsizSinemaEkrani> {
       pasCezali: _o.ayar('ceza') == '1',
     );
     try {
-      final tum = await ref.read(icerikProvider(_dosya).future);
-      final bildirilen = await _gecmis.bildirilenler('09');
-      final gorulen = await _gecmis.gorulenler('09');
+      final tum = await ref.read(icerikProvider(_y.dosya).future);
+      final bildirilen = await _gecmis.bildirilenler(_y.oyunKodu);
+      final gorulen = await _gecmis.gorulenler(_y.oyunKodu);
       final k = _o.ayar('kategori');
       final havuz = tum
           .where((o) =>
-              o.tur == 'oge' &&
+              o.tur == _y.ogeTur &&
               (k == 'karisik' || o.seviye == k) &&
               !bildirilen.contains(o.id))
           .toList();
@@ -173,6 +205,12 @@ class _DilsizDurum extends ConsumerState<DilsizSinemaEkrani> {
 
   void _turBasla() {
     _oyun.turBaslat();
+    if (_y.ifadeli) {
+      final secim = _o.ayar('ifade');
+      const dongu = ['mirildan', 'islik', 'tempo'];
+      _ifade = secim == 'karisik' ? dongu[_oyun.tamamlanan % dongu.length] : secim;
+      _ifadeler.add(_ifade);
+    }
     _duraklat = false;
     _sonZorluk.clear();
     _ogeCek();
@@ -196,7 +234,7 @@ class _DilsizDurum extends ConsumerState<DilsizSinemaEkrani> {
     }
     if (o == null) return;
     _sonZorluk.add(o.ek);
-    _gecmis.gorulenleriKaydet('09', d.gorulen);
+    _gecmis.gorulenleriKaydet(_y.oyunKodu, d.gorulen);
     if (d.yenilenme > _yenilenme) {
       _yenilenme = d.yenilenme;
       _bilgi = ref.read(premiumProvider)
@@ -247,8 +285,8 @@ class _DilsizDurum extends ConsumerState<DilsizSinemaEkrani> {
             // geri alınan öğeyi tekrar göster
             setState(() => _oge = IcerikOgesi(
                   id: k.id,
-                  oyun: '09',
-                  tur: 'oge',
+                  oyun: _y.oyunKodu,
+                  tur: _y.ogeTur,
                   seviye: '',
                   metin: k.metin,
                   ek: '',
@@ -291,7 +329,7 @@ class _DilsizDurum extends ConsumerState<DilsizSinemaEkrani> {
   Future<void> _bildir() async {
     final o = _oge;
     if (o == null) return;
-    await _gecmis.bildir('09', o.id);
+    await _gecmis.bildir(_y.oyunKodu, o.id);
     _ogeCek();
     if (mounted) setState(() {});
   }
@@ -314,8 +352,10 @@ class _DilsizDurum extends ConsumerState<DilsizSinemaEkrani> {
             children: [
               Text('$_geriSayim',
                   style: const TextStyle(fontSize: 120, fontWeight: FontWeight.w900)),
-              const Text('Ekranı kendine çevir. Konuşmak ve harf göstermek yasak.',
-                  textAlign: TextAlign.center),
+              if (_y.ifadeli)
+                Text('Bu turda: ${ifadeAdlari[_ifade]}',
+                    style: const TextStyle(fontSize: 22), textAlign: TextAlign.center),
+              Text(_y.hazirIpucu, textAlign: TextAlign.center),
             ],
           ),
         ),
@@ -360,6 +400,7 @@ class _DilsizDurum extends ConsumerState<DilsizSinemaEkrani> {
                     const SizedBox(height: 12),
                     Text('$pasSatiri · Doğru: ${t.dogru()}',
                         style: TextStyle(color: r.metinIkincil)),
+                    if (_y.ifadeli) Text(ifadeAdlari[_ifade] ?? ''),
                   ],
                 ),
               ),
@@ -532,6 +573,18 @@ class _DilsizDurum extends ConsumerState<DilsizSinemaEkrani> {
     );
   }
 
+  int? _islikSampiyonu() {
+    final m = <int, int>{};
+    for (var i = 0; i < _oyun.turlar.length && i < _ifadeler.length; i++) {
+      if (_ifadeler[i] != 'islik') continue;
+      final t = _oyun.turlar[i];
+      m[t.anlaticiId] = (m[t.anlaticiId] ?? 0) + t.dogru();
+    }
+    if (m.isEmpty) return null;
+    final e = m.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    return e.first.value > 0 ? e.first.key : null;
+  }
+
   Widget _final() {
     final kaz = _oyun.kazananlar();
     final mu = _oyun.mimikUstasi();
@@ -555,8 +608,11 @@ class _DilsizDurum extends ConsumerState<DilsizSinemaEkrani> {
               trailing: Text('${_oyun.skor[i]}',
                   style: const TextStyle(fontWeight: FontWeight.w800)),
             ),
-          if (mu != null)
-            ListTile(title: const Text('Mimik Ustası'), subtitle: Text(_oyuncu(mu).ad)),
+          if (mu != null) ListTile(title: Text(_y.rozet), subtitle: Text(_oyuncu(mu).ad)),
+          if (_y.ifadeli && _islikSampiyonu() != null)
+            ListTile(
+                title: const Text('Islık Şampiyonu'),
+                subtitle: Text(_oyuncu(_islikSampiyonu()!).ad)),
           const Spacer(),
           FilledButton(
             onPressed: () {
