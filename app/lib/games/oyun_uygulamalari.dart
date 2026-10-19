@@ -9,6 +9,7 @@ import 'gizli_hediye/gizli_hediye.dart';
 import 'hic_yapmadim_ki/hic_yapmadim_ki.dart';
 import 'kim_casus/kim_casus.dart';
 import 'oyun_uygulamasi.dart';
+import 'tek_kelime/tek_kelime.dart';
 import 'yeni_yil_kehaneti/yeni_yil_kehaneti.dart';
 
 /// Çalışan (uygulanmış) oyunlar; kayıt dışı olanlar "Yakında" görünür.
@@ -24,6 +25,7 @@ final Map<String, OyunUygulamasi> _uygulamalar = {
   alnimdakiKim.id: alnimdakiKim,
   birbirimiziTaniyoruz.id: birbirimiziTaniyoruz,
   bilgiYarismasi.id: bilgiYarismasi,
+  tekKelime.id: tekKelime,
 };
 
 OyunUygulamasi? oyunUygulamasi(String id) => _uygulamalar[id];
