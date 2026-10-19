@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../app/theme.dart';
 import '../games/oyun_uygulamalari.dart';
 import '../games/registry.dart';
+import '../monetization/reklam_servisi.dart';
 import '../room/oda_ekranlari.dart';
 
 /// M06: oyun detayı.
@@ -23,6 +24,7 @@ class OyunDetayEkrani extends StatelessWidget {
     final r = context.renkler;
     return Scaffold(
       appBar: AppBar(title: Text(oyun.ad)),
+      bottomNavigationBar: const ReklamBandi(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),

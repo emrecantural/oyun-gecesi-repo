@@ -74,6 +74,15 @@ def patch_manifest() -> None:
             '<application\n        android:appCategory="game"',
             1,
         )
+    if "com.google.android.gms.ads.APPLICATION_ID" not in text:
+        # Varsayılan Google TEST uygulama kimliği (D-039); üretim kimliği yalnız açık yetkiyle ADMOB_APP_ID ile verilir.
+        app_id = os.environ.get("ADMOB_APP_ID", "ca-app-pub-3940256099942544~3347511713")
+        text = text.replace(
+            "</application>",
+            '    <meta-data\n            android:name="com.google.android.gms.ads.APPLICATION_ID"\n'
+            f'            android:value="{app_id}"/>\n    </application>',
+            1,
+        )
     text = re.sub(r'android:label="[^"]*"', 'android:label="Oyun Gecesi"', text, count=1)
 
     with open(MANIFEST, "w", encoding="utf-8") as f:

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../games/oyun_uygulamasi.dart';
+import '../../monetization/reklam_servisi.dart';
 import 'oyuncular.dart';
 
 /// Masadaki oyuncular (oyunlar arasında korunur, yalnız bellekte).
@@ -55,8 +56,19 @@ class OturumNotifier extends Notifier<OyunOturumu?> {
   @override
   OyunOturumu? build() => null;
 
-  void baslat(OyunOturumu oturum) => state = oturum;
+  void baslat(OyunOturumu oturum) {
+    state = oturum;
+    ref.read(reklamProvider).oyunBasladi();
+  }
+
+  /// Oyundan vazgeçildi (reklam yok).
   void bitir() => state = null;
+
+  /// Oyun sonuna kadar oynandı: sıklık sayacı işler, kural uygunsa geçiş reklamı gösterilir.
+  void tamamlandi() {
+    ref.read(reklamProvider).oyunTamamlandi();
+    state = null;
+  }
 }
 
 final oturumProvider =

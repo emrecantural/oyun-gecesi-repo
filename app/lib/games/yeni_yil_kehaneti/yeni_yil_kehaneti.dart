@@ -489,7 +489,7 @@ class _KehanetDurum extends ConsumerState<YeniYilKehaneti> {
           const SizedBox(height: 8),
           OutlinedButton(
             onPressed: () {
-              ref.read(oturumProvider.notifier).bitir();
+              ref.read(oturumProvider.notifier).tamamlandi();
               context.go('/');
             },
             child: const Text('Ana sayfa'),
@@ -638,7 +638,7 @@ class _KehanetDurum extends ConsumerState<YeniYilKehaneti> {
             onPressed: () async {
               await _sil();
               if (!mounted) return;
-              ref.read(oturumProvider.notifier).bitir();
+              ref.read(oturumProvider.notifier).tamamlandi();
               context.go('/');
             },
             child: const Text('Kapsülü sil ve çık'),

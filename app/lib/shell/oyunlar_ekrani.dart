@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../app/theme.dart';
 import '../games/registry.dart';
+import '../monetization/reklam_servisi.dart';
 
 class OyunlarEkrani extends StatelessWidget {
   const OyunlarEkrani({super.key});
@@ -26,6 +27,7 @@ class OyunlarEkrani extends StatelessWidget {
           ),
         ],
       ),
+      bottomNavigationBar: const ReklamBandi(),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: oyunlar.length,

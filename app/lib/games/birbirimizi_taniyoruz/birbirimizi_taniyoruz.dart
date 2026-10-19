@@ -444,7 +444,7 @@ class _TanisDurum extends ConsumerState<BirbirimiziTaniyoruzEkrani> {
           ),
           FilledButton(
             onPressed: () {
-              ref.read(oturumProvider.notifier).bitir();
+              ref.read(oturumProvider.notifier).tamamlandi();
               context.go('/');
             },
             child: const Text('Ana sayfa'),

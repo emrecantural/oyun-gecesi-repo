@@ -542,7 +542,7 @@ class _YkDurum extends ConsumerState<YasakKelimeEkrani> {
           const Spacer(),
           FilledButton(
             onPressed: () {
-              ref.read(oturumProvider.notifier).bitir();
+              ref.read(oturumProvider.notifier).tamamlandi();
               context.go('/');
             },
             child: const Text('Ana sayfa'),

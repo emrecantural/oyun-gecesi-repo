@@ -552,7 +552,7 @@ class _QuizDurum extends ConsumerState<BilgiYarismasiEkrani> {
           ),
           FilledButton(
             onPressed: () {
-              ref.read(oturumProvider.notifier).bitir();
+              ref.read(oturumProvider.notifier).tamamlandi();
               context.go('/');
             },
             child: const Text('Ana sayfa'),
