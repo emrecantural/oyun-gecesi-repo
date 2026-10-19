@@ -88,7 +88,7 @@ class _OylamaDurum extends State<_Oylama> {
     }
     // Yeniden bağlanınca sunucudaki oyu göster.
     final ozel = i.ozel;
-    final sunucudaki = widget.tahmin ? ozel?['myPredict'] : ozel?['myVote'];
+    final sunucudaki = ozel?[widget.tahmin ? 'myPredict' : 'myVote'];
     final canli = i.son['myVote'];
     final canliHedef = canli != null && canli['qId'] == widget.qId ? canli['target'] : null;
     final secili = _secim ??
