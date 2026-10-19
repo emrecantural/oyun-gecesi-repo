@@ -26,7 +26,7 @@ Map<String, int> varsayilanPaket(int n) {
 /// Kurucu için rol paketi düzenleyici (toplam oyuncu sayısına eşit olmalı).
 Future<void> rolPaketiAc(BuildContext context, OdaIstemcisi i, int oyuncuSayisi) {
   final mevcut = (i.acik['rolePack'] as Map?)?.map((k, v) => MapEntry(k as String, (v as num).toInt()));
-  final paket = {...?mevcut ?? varsayilanPaket(oyuncuSayisi < 6 ? 6 : oyuncuSayisi)};
+  final paket = <String, int>{...(mevcut ?? varsayilanPaket(oyuncuSayisi < 6 ? 6 : oyuncuSayisi))};
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
