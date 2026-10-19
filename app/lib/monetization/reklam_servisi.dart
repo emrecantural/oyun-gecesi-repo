@@ -158,7 +158,7 @@ class _ReklamBandiDurum extends ConsumerState<ReklamBandi> {
   Future<void> _yukle(int genislik) async {
     _istendi = true;
     try {
-      final boyut = await AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(genislik);
+      final boyut = await AdSize.getLargeAnchoredAdaptiveBannerAdSize(genislik);
       if (boyut == null || !mounted) return;
       final b = BannerAd(
         adUnitId: _bannerKimligi,
