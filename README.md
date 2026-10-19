@@ -15,7 +15,7 @@ Doğrulanan: Android CI (analiz, birim/widget testleri, debug APK, release AAB) 
 **Doğrulanmayan:** hiçbir şey gerçek cihazda/emülatörde çalıştırılmadı; sunucu Cloudflare'a dağıtılmadı; görünüm gözle denetlenmedi.
 
 Bilinen eksikler:
-- İçerik CSV'lerindeki tüm satırlar `taslak`; editör onayı olmadan release AAB içerik taşımaz.
+- İçerik: 2.874 satırın tamamı 2026-10-19'da editör (kullanıcı) tarafından onay masasında toplu onaylandı (ret ve düzeltme yok); `durum=onayli`, `editor=emrecantural`. Release AAB artık içerik taşır. Hukuk/telif ve doğruluk (özellikle 15 Bilgi Yarışması) taraması ayrıca yapılmadı.
 - Sunucu: Play satın alma doğrulaması yok → oda kurma `GECIS_KAPISI=acik` ile açılır, yoksa `402 NO_ROOM_RIGHT`; `/v1/passes/redeem` 501. Takma ad yasaklı listesi yer tutucudur.
 - 07 oda: kurucunun premium bildirimi istemci tarafında doğrulanır (kabul edilen risk). Tombala sesli okuma yok.
 - İstemci: oda panelleri cihazda denenmedi (03 oda rol paketi düzenleyicisi var, yerel PASS modunda yok); 24 Gizli Hediye eşleşmeyi cihaza yazmaz (D-053); 23 Yeni Yıl Kehaneti çıkarıldı, yerine 20 Hafıza Düellosu (tek cihaz) geldi (D-052); yazı tipi ve ses varlıkları yok.
