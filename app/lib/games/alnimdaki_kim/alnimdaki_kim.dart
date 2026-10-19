@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 
 import '../../app/premium.dart';
 import '../../app/theme.dart';
@@ -17,6 +18,7 @@ import '../../shell/ortak/oturum.dart';
 import '../../shell/ortak/oyuncular.dart';
 import '../oyun_uygulamasi.dart';
 import 'alnim_mantik.dart';
+import 'egim.dart';
 
 const _dosya = '29-alnimdaki-kim';
 
@@ -60,6 +62,12 @@ final alnimdakiKim = OyunUygulamasi(
       varsayilan: 'karisik',
     ),
     AyarSatiri(
+      anahtar: 'giris',
+      baslik: 'Kontrol',
+      secenekler: {'egim': 'Eğim', 'dugme': 'Düğme'},
+      varsayilan: 'egim',
+    ),
+    AyarSatiri(
       anahtar: 'pas',
       baslik: 'Pas',
       secenekler: {'3': '3 hak', '0': 'Sınırsız'},
@@ -94,6 +102,9 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
   DateTime _kelimeBasi = DateTime.now();
   int _geriSayim = 3;
   Timer? _gsTimer;
+  EgimTespitcisi? _egim;
+  StreamSubscription<AccelerometerEvent>? _egimAbone;
+  bool _egimModu = false;
   Timer? _flasTimer;
   Color? _flas;
   String _flasYazi = '';
@@ -119,6 +130,7 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
     _gsTimer?.cancel();
     _flasTimer?.cancel();
     _ozetTimer?.cancel();
+    _egimBitir();
     _sayac.dispose();
     SystemChrome.setPreferredOrientations(const []);
     super.dispose();
@@ -155,7 +167,42 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
     }
   }
 
+  void _egimBaslat() {
+    _egimBitir();
+    if (_o.ayar('giris') != 'egim') return;
+    final e = EgimTespitcisi();
+    _egim = e;
+    try {
+      _egimAbone = accelerometerEventStream(samplingPeriod: SensorInterval.gameInterval).listen(
+        (ev) {
+          final o = e.isle(ev.x, ev.y, ev.z, DateTime.now().millisecondsSinceEpoch);
+          if (o != null && _asama == _Asama.tur && _egimModu) {
+            _kaydetVeIlerle(o == EgimOlayi.dogru ? Sonuc.dogru : Sonuc.pas);
+          }
+        },
+        onError: (_) => _egimHatasi(),
+        cancelOnError: true,
+      );
+    } catch (_) {
+      _egim = null;
+    }
+  }
+
+  void _egimHatasi() {
+    // Sensör akışı kesildi: tur bozulmadan Düğme Moduna geç.
+    _egimModu = false;
+    if (mounted && _asama == _Asama.tur) {
+      _flasGoster(Colors.orange.shade800, 'Eğim çalışmıyor, düğmeyle oynanacak.');
+    }
+  }
+
+  void _egimBitir() {
+    unawaited(_egimAbone?.cancel());
+    _egimAbone = null;
+  }
+
   void _hazirlikBaslat() {
+    _egimBaslat();
     _geriSayim = 3;
     _asama = _Asama.hazirlik;
     setState(() {});
@@ -177,6 +224,7 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
   }
 
   void _turBaslat() {
+    _egimModu = _egim?.hazir ?? false;
     _satirlar.clear();
     _duraklat = false;
     _yeniKelime();
@@ -184,6 +232,9 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
     setState(() {});
     _sayac.addListener(_yenile);
     _sayac.baslat(_o.ayarInt('sure') * 1000, bitince: _turBitti);
+    if (_o.ayar('giris') == 'egim' && !_egimModu) {
+      _flasGoster(Colors.orange.shade800, 'Eğim çalışmıyor, düğmeyle oynanacak.');
+    }
   }
 
   void _yenile() {
@@ -235,6 +286,8 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
 
   void _turBitti() {
     _sayac.removeListener(_yenile);
+    _egimBitir();
+    _egimModu = false;
     _kelime = null; // açık kelime sayılmaz
     _asama = _Asama.ozet;
     SystemChrome.setPreferredOrientations(const []);
@@ -413,9 +466,13 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
                 Expanded(
                   child: SizedBox(
                     height: 72,
-                    child: OutlinedButton(
-                      onPressed: _duraklat ? null : () => _kaydetVeIlerle(Sonuc.pas),
-                      child: Text(pasKalan == null ? '✕ PAS' : '✕ PAS ($pasKalan)'),
+                    child: _TutKoruma(
+                      etkin: _egimModu && !_duraklat,
+                      onTetik: () => _kaydetVeIlerle(Sonuc.pas),
+                      child: OutlinedButton(
+                        onPressed: _duraklat ? null : (_egimModu ? () {} : () => _kaydetVeIlerle(Sonuc.pas)),
+                        child: Text(pasKalan == null ? '✕ PAS' : '✕ PAS ($pasKalan)'),
+                      ),
                     ),
                   ),
                 ),
@@ -423,9 +480,13 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
                 Expanded(
                   child: SizedBox(
                     height: 72,
-                    child: FilledButton(
-                      onPressed: _duraklat ? null : () => _kaydetVeIlerle(Sonuc.dogru),
-                      child: const Text('✓ DOĞRU'),
+                    child: _TutKoruma(
+                      etkin: _egimModu && !_duraklat,
+                      onTetik: () => _kaydetVeIlerle(Sonuc.dogru),
+                      child: FilledButton(
+                        onPressed: _duraklat ? null : (_egimModu ? () {} : () => _kaydetVeIlerle(Sonuc.dogru)),
+                        child: const Text('✓ DOĞRU'),
+                      ),
                     ),
                   ),
                 ),
@@ -558,6 +619,47 @@ class _AlnimDurum extends ConsumerState<AlnimdakiKimEkrani> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Eğim Modu'nda yanlışlıkla alına/ele değmeye karşı düğme 400 ms basılı tutulmalı.
+/// [etkin] false ise (Düğme Modu) sarmalayıcı hiçbir şey yapmaz; düğmenin kendi dokunuşu çalışır.
+class _TutKoruma extends StatefulWidget {
+  const _TutKoruma({required this.etkin, required this.onTetik, required this.child});
+  final bool etkin;
+  final VoidCallback onTetik;
+  final Widget child;
+
+  @override
+  State<_TutKoruma> createState() => _TutKorumaDurum();
+}
+
+class _TutKorumaDurum extends State<_TutKoruma> {
+  Timer? _t;
+
+  void _iptal() {
+    _t?.cancel();
+    _t = null;
+  }
+
+  @override
+  void dispose() {
+    _iptal();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.etkin) return widget.child;
+    return Listener(
+      onPointerDown: (_) {
+        _iptal();
+        _t = Timer(const Duration(milliseconds: 400), widget.onTetik);
+      },
+      onPointerUp: (_) => _iptal(),
+      onPointerCancel: (_) => _iptal(),
+      child: widget.child,
     );
   }
 }
