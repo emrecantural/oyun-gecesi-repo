@@ -602,7 +602,7 @@ class _CasusDurum extends ConsumerState<KimCasusEkrani> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('${trUpper(_p[voter].ad)}',
+            Text(trUpper(_p[voter].ad),
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
