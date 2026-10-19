@@ -4,8 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../app/theme.dart';
 import '../games/oyun_uygulamalari.dart';
 import '../games/registry.dart';
+import '../room/oda_ekranlari.dart';
 
-/// M06: oyun detayı. Oynatma henüz bağlı değil; düğme "Yakında".
+/// M06: oyun detayı.
 class OyunDetayEkrani extends StatelessWidget {
   const OyunDetayEkrani({super.key, required this.oyunId});
   final String oyunId;
@@ -48,8 +49,16 @@ class OyunDetayEkrani extends StatelessWidget {
                 FilledButton(
                   onPressed: () => context.push('/oyun/${oyun.id}/oyuncular'),
                   child: const Text('Bu cihazda oyna'),
-                )
-              else
+                ),
+              if (odaOyunlari.contains(oyun.id)) ...[
+                if (oyunUygulamasi(oyun.id) != null && !oyun.sadeceOda)
+                  const SizedBox(height: 8),
+                FilledButton.tonal(
+                  onPressed: () => context.push('/oyun/${oyun.id}/oda'),
+                  child: const Text('Oda kur (herkes kendi telefonunda)'),
+                ),
+              ],
+              if (oyunUygulamasi(oyun.id) == null && !odaOyunlari.contains(oyun.id))
                 const FilledButton(
                   onPressed: null,
                   child: Text('Yakında'),

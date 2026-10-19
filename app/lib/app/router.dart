@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../room/oda_ekranlari.dart';
+import '../room/oda_servisi.dart';
 import '../shell/ayarlar_ekrani.dart';
 import '../shell/oyun_detay_ekrani.dart';
 import '../shell/oyunlar_ekrani.dart';
@@ -40,11 +42,26 @@ final routerProvider = Provider<GoRouter>((ref) {
                 OyunAyarEkrani(oyunId: state.pathParameters['id']!),
           ),
           GoRoute(
+            path: 'oda',
+            builder: (_, state) =>
+                OdaKurEkrani(oyunId: state.pathParameters['id']!),
+          ),
+          GoRoute(
             path: 'oyna',
             builder: (_, state) =>
                 OynaEkrani(oyunId: state.pathParameters['id']!),
           ),
         ],
+      ),
+      GoRoute(path: '/katil', builder: (_, _) => const OdaKatilEkrani()),
+      GoRoute(
+        path: '/oda/:kod',
+        builder: (_, state) {
+          final giris = state.extra;
+          if (giris is OdaGirisi) return OdaEkrani(giris: giris);
+          // Doğrudan adres / süreç yeniden başladı: kodla katılma ekranına dön.
+          return const OdaKatilEkrani();
+        },
       ),
       GoRoute(path: '/ayarlar', builder: (_, _) => const AyarlarEkrani()),
     ],

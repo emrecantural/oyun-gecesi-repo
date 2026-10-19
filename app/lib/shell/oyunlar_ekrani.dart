@@ -15,6 +15,11 @@ class OyunlarEkrani extends StatelessWidget {
             style: TextStyle(fontWeight: FontWeight.w800)),
         actions: [
           IconButton(
+            tooltip: 'Odaya katıl',
+            icon: const Icon(Icons.login_rounded),
+            onPressed: () => context.push('/katil'),
+          ),
+          IconButton(
             tooltip: 'Ayarlar',
             icon: const Icon(Icons.settings_rounded),
             onPressed: () => context.push('/ayarlar'),

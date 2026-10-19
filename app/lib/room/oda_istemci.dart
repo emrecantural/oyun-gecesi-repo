@@ -103,6 +103,9 @@ class OdaIstemcisi extends ChangeNotifier {
   Map<String, dynamic> ayarlar = const {};
   Map<String, dynamic> acik = const {};
   Map<String, dynamic>? ozel;
+
+  /// Son gelen oyun mesajları (anahtar: `t`; 'private' için `kind`). Ekranlar bunları okur.
+  final Map<String, Map<String, dynamic>> son = {};
   List<OdaOyuncusu> oyuncular = const [];
   int ekranSayisi = 0;
   int _sapma = 0;
@@ -225,6 +228,8 @@ class OdaIstemcisi extends ChangeNotifier {
         bitis = (s['endsAt'] as num?)?.toInt();
         acik = (s['public'] as Map<String, dynamic>?) ?? const {};
         ozel = s['private'] as Map<String, dynamic>?;
+        son.clear();
+        _ozelTohumla();
         _rosterAl(s['roster'] as Map<String, dynamic>?);
         seq = m.seq;
         durum = BaglantiDurumu.bagli;
@@ -245,24 +250,53 @@ class OdaIstemcisi extends ChangeNotifier {
         seq = m.seq;
       case 'private':
         final k = m.p['kind'];
-        if (k == 'reset') {
-          ozel = null;
-        }
+        if (k is String) son[k] = m.p;
       case 'error':
         sonHata = m.p['code'] as String?;
-        if (_sonlandiranHatalar.contains(sonHata)) {
+        if (_sonlandiranHatalar.contains(sonHata) || durum != BaglantiDurumu.bagli) {
+          // Katılım reddi veya kesin son: yeniden denemeden kapat.
           kapanisNedeni = sonHata;
           _kullaniciKapatti = true;
           durum = BaglantiDurumu.kapali;
+          unawaited(_tasima?.kapat());
         }
       case 'closed':
         kapanisNedeni = m.p['reason'] as String? ?? 'closed';
         _kullaniciKapatti = true;
         durum = BaglantiDurumu.kapali;
+      case 'ack':
+        break;
       default:
-        if (m.t != 'ack') seq = m.seq > seq ? m.seq : seq;
+        son[m.t] = m.p;
+        seq = m.seq > seq ? m.seq : seq;
     }
     notifyListeners();
+  }
+
+  /// Anlık görüntüdeki özel durumu, canlı mesajlarla aynı anahtarlara döker.
+  void _ozelTohumla() {
+    final o = ozel;
+    if (o == null) return;
+    if (o['kind'] == 'cards') son['cards'] = o;
+    for (final k in const ['nightPrompt', 'witchInfo']) {
+      final v = o[k];
+      if (v is Map<String, dynamic>) son[k] = v;
+    }
+    if (o['wolfBoard'] is Map<String, dynamic>) {
+      son['wolfBoard'] = {'kind': 'wolfBoard', 'votes': o['wolfBoard']};
+    }
+    if (o['role'] is String) {
+      son['roleAssigned'] = {
+        'kind': 'roleAssigned',
+        'role': o['role'],
+        'allies': o['allies'] ?? const [],
+        'loverId': o['loverId'],
+      };
+    }
+    final gecmis = o['seerResults'];
+    if (gecmis is List && gecmis.isNotEmpty) {
+      son['seerHistory'] = {'results': gecmis};
+    }
   }
 
   void _rosterAl(Map<String, dynamic>? r) {

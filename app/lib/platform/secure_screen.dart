@@ -19,6 +19,9 @@ class EkranKorumasi {
     if (_sayi == 0) await _gonder('disable');
   }
 
+  static Future<void> acikTut() => _gonder('keepOn');
+  static Future<void> acikTutmayiBirak() => _gonder('keepOff');
+
   static Future<void> _gonder(String yontem) async {
     try {
       await _kanal.invokeMethod<void>(yontem);

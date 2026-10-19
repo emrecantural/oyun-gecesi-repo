@@ -3,7 +3,7 @@
 
 - INTERNET izni, predictive back, appCategory=game, uygulama adı
 - test/widget_test.dart şablonunu siler
-- MainActivity: FLAG_SECURE için MethodChannel (platform/secure_screen.dart)
+- MainActivity: FLAG_SECURE ve FLAG_KEEP_SCREEN_ON için MethodChannel (platform/secure_screen.dart)
 Yinelenen çalıştırmada güvenlidir (idempotent).
 """
 import os
@@ -34,6 +34,14 @@ class MainActivity : FlutterActivity() {
                     }
                     "disable" -> {
                         window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                        result.success(null)
+                    }
+                    "keepOn" -> {
+                        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                        result.success(null)
+                    }
+                    "keepOff" -> {
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                         result.success(null)
                     }
                     else -> result.notImplemented()
