@@ -19,14 +19,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/onboarding', builder: (_, __) => const OnboardingEkrani()),
-      GoRoute(path: '/', builder: (_, __) => const OyunlarEkrani()),
+      GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingEkrani()),
+      GoRoute(path: '/', builder: (_, _) => const OyunlarEkrani()),
       GoRoute(
         path: '/oyun/:id',
         builder: (_, state) =>
             OyunDetayEkrani(oyunId: state.pathParameters['id']!),
       ),
-      GoRoute(path: '/ayarlar', builder: (_, __) => const AyarlarEkrani()),
+      GoRoute(path: '/ayarlar', builder: (_, _) => const AyarlarEkrani()),
     ],
   );
 });
