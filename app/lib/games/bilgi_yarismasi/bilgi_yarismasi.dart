@@ -25,6 +25,12 @@ final bilgiYarismasi = OyunUygulamasi(
   id: '15',
   ayarlar: const [
     AyarSatiri(
+      anahtar: 'mod',
+      baslik: 'Oyun şekli',
+      secenekler: {'sirayla': 'Sırayla (telefon dolaşır)', 'ortak': 'Ortak ekran (2–4 kişi)'},
+      varsayilan: 'sirayla',
+    ),
+    AyarSatiri(
       anahtar: 'soru',
       baslik: 'Soru sayısı',
       secenekler: {'10': '10', '15': '15', '20': '20'},
@@ -107,6 +113,7 @@ class _QuizDurum extends ConsumerState<BilgiYarismasiEkrani> {
   SayisalSoru? _sayisalSoru;
 
   OyunOturumu get _o => widget.oturum;
+  bool get _ortak => _o.ayar('mod') == 'ortak';
   List<Oyuncu> get _p => _o.oyuncular;
   Oyuncu _oyuncu(int id) => _p.firstWhere((p) => p.id == id);
   int get _toplamMs => _o.ayarInt('sure') * 1000;
@@ -132,6 +139,12 @@ class _QuizDurum extends ConsumerState<BilgiYarismasiEkrani> {
   }
 
   Future<void> _kur() async {
+    if (_ortak && _p.length > 4) {
+      // G8: ortak ekran en çok 4 bölge taşır.
+      _hata = 'Bu ekran ${_p.length} kişiye yetmiyor. Sırayla oynayın.';
+      setState(() {});
+      return;
+    }
     _m = QuizMotoru(
       oyuncuIdleri: [for (final p in _p) p.id],
       soruSayisi: _o.ayarInt('soru'),
@@ -189,8 +202,44 @@ class _QuizDurum extends ConsumerState<BilgiYarismasiEkrani> {
     final n = _p.length;
     _sira = [for (var i = 0; i < n; i++) _p[(_m.soruNo + i) % n].id];
     _siraIdx = 0;
+    if (_ortak) {
+      _ortakBasla();
+      return;
+    }
     _asama = _Asama.devir;
     setState(() {});
+  }
+
+  // ---- Ortak ekran (SHARED): herkes aynı anda, ekran bölgelere ayrılır ----
+  void _ortakBasla() {
+    _kaldirilan = {};
+    _jokerli = false;
+    _asama = _Asama.oku;
+    setState(() {});
+    _zamanlayici?.cancel();
+    _zamanlayici = Timer(Duration(seconds: _o.ayarInt('okuma')), () {
+      if (!mounted || _asama != _Asama.oku) return;
+      _sayac.baslat(_toplamMs, bitince: _ortakBitir);
+      setState(() => _asama = _Asama.cevap);
+    });
+  }
+
+  void _ortakSec(int oyuncuId, int secim) {
+    if (_asama != _Asama.cevap || _m.yanitladi(oyuncuId)) return;
+    HapticFeedback.selectionClick();
+    _m.cevapla(oyuncuId, secim, _sayac.kalanMs);
+    if (_p.every((p) => _m.yanitladi(p.id))) {
+      _ortakBitir();
+    } else {
+      setState(() {});
+    }
+  }
+
+  void _ortakBitir() {
+    if (_asama != _Asama.cevap) return;
+    _sayac.durdur();
+    _sonuc = _m.soruyuBitir(_soru!);
+    setState(() => _asama = _Asama.reveal);
   }
 
   void _oyuncuBasla() {
@@ -310,7 +359,7 @@ class _QuizDurum extends ConsumerState<BilgiYarismasiEkrani> {
   }
 
   Widget _baslikSatiri() => Text(
-      '${_oyuncu(_sira[_siraIdx]).ad} · Soru ${_m.soruNo + 1}/${_m.soruSayisi}'
+      '${_ortak ? '' : '${_oyuncu(_sira[_siraIdx]).ad} · '}Soru ${_m.soruNo + 1}/${_m.soruSayisi}'
       '${_m.sonSoru ? ' · Son soru: çift puan!' : ''}',
       style: TextStyle(color: context.renkler.metinIkincil));
 
@@ -334,7 +383,76 @@ class _QuizDurum extends ConsumerState<BilgiYarismasiEkrani> {
         ),
       );
 
+  /// SHARED: her oyuncuya bir bölge; üst bölgeler karşıdan okunur için 180° döner.
+  Widget _ortakCevapEkrani() {
+    final r = context.renkler;
+    final s = _soru!;
+    final renkler = [r.tehlike, r.ana, r.uyari, r.nane];
+    final n = _p.length;
+    Widget bolge(Oyuncu o, {required bool ters}) {
+      final cevaplandi = _m.yanitladi(o.id);
+      final ic = Container(
+        margin: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: r.yuzey,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(o.ad, style: TextStyle(color: r.metinIkincil, fontWeight: FontWeight.w700)),
+            Text(s.metin, maxLines: 3, overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.w800)),
+            const SizedBox(height: 6),
+            Expanded(
+              child: cevaplandi
+                  ? const Center(child: Text('Yanıtın alındı ✓', style: TextStyle(fontSize: 20)))
+                  : GridView.count(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 6,
+                      crossAxisSpacing: 6,
+                      childAspectRatio: 2.2,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        for (var i = 0; i < 4; i++)
+                          FilledButton(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: renkler[i],
+                              foregroundColor: Colors.black,
+                              padding: const EdgeInsets.symmetric(horizontal: 4),
+                            ),
+                            onPressed: () => _ortakSec(o.id, i),
+                            child: Text('${_sekil[i]} ${s.siklar[i]}',
+                                maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center),
+                          ),
+                      ],
+                    ),
+            ),
+          ],
+        ),
+      );
+      return Expanded(child: ters ? RotatedBox(quarterTurns: 2, child: ic) : ic);
+    }
+
+    final ust = <Widget>[];
+    final alt = <Widget>[];
+    for (var i = 0; i < n; i++) {
+      // 2 kişi: biri üst (ters), biri alt. 3–4 kişi: üstte ikisi (ters), altta kalanlar.
+      final ustte = i < n ~/ 2;
+      (ustte ? ust : alt).add(bolge(_p[i], ters: ustte));
+    }
+    return Column(
+      children: [
+        LinearProgressIndicator(value: _sayac.oran, minHeight: 8),
+        Expanded(child: Row(children: ust)),
+        Expanded(child: Row(children: alt)),
+      ],
+    );
+  }
+
   Widget _cevapEkrani() {
+    if (_ortak) return _ortakCevapEkrani();
     final r = context.renkler;
     final s = _soru!;
     final renkler = [r.tehlike, r.ana, r.uyari, r.nane];
