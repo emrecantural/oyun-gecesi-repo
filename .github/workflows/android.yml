@@ -40,11 +40,11 @@ jobs:
           fi
           exit $code
       - name: Testler
-        run: flutter test
+        run: bash tool/ci_calistir.sh flutter test
       - name: Debug APK
-        run: flutter build apk --debug --dart-define=ICERIK_TASLAK=true
+        run: bash tool/ci_calistir.sh flutter build apk --debug --dart-define=ICERIK_TASLAK=true
       - name: Release AAB (hata ayıklama imzalı; yükleme anahtarı henüz yok)
-        run: flutter build appbundle --release
+        run: bash tool/ci_calistir.sh flutter build appbundle --release
       - uses: actions/upload-artifact@v4
         with:
           name: oyun-gecesi-android
