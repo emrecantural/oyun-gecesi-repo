@@ -1,0 +1,12 @@
+# Dağıtım için Cloudflare hesabı gerekir (kullanıcıda). Sırlar burada tutulmaz.
+name = "oyun-gecesi-oda"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+[[durable_objects.bindings]]
+name = "ODA"
+class_name = "OdaNesnesi"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["OdaNesnesi"]

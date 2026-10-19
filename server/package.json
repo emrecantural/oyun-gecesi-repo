@@ -1,0 +1,15 @@
+{
+  "name": "oyun-gecesi-sunucu",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test": "node --test \"test/**/*.test.ts\"",
+    "tip": "tsc --noEmit",
+    "icerik": "node scripts/icerik.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250101.0",
+    "typescript": "^5.8.0"
+  }
+}

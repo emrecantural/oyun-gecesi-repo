@@ -1,0 +1,42 @@
+name: sunucu
+on:
+  push:
+    paths: ['server/**', 'golden/**', '.github/workflows/sunucu.yml']
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - name: İçerik üret (yalnız onaylı)
+        run: npm run icerik
+      - name: Tip denetimi
+        run: |
+          set +e
+          npx tsc --noEmit > tip.txt 2>&1
+          code=$?
+          cat tip.txt
+          if [ $code -ne 0 ]; then
+            head -30 tip.txt | while IFS= read -r l; do echo "::error::${l}"; done
+          fi
+          exit $code
+      - name: Testler
+        run: |
+          set +e
+          npm test > test.txt 2>&1
+          code=$?
+          tail -80 test.txt
+          if [ $code -ne 0 ]; then
+            grep -E "^not ok|AssertionError|expected|actual" test.txt | head -30 | while IFS= read -r l; do echo "::error::${l}"; done
+          fi
+          exit $code
