@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'oda_istemci.dart';
@@ -21,7 +22,11 @@ class OdaHatasi implements Exception {
 
 /// Hata kodlarının kullanıcıya gösterilen Türkçe karşılıkları.
 String hataMetni(String? kod) => switch (kod) {
-      'NO_ROOM_RIGHT' => 'Oda kurmak için oda hakkı gerekiyor. Bir arkadaşının kurduğu odaya katılabilirsin.',
+      'NO_ROOM_RIGHT' =>
+        'İlk odan ücretsizdi. Yeni oda için 4 saatlik oda geçişi alabilirsin; bir odaya katılmak her zaman ücretsiz.',
+      'PURCHASE_PENDING' => 'Ödeme onay bekliyor. Onaylanınca geçiş otomatik tanımlanır.',
+      'PURCHASE_INVALID' => 'Satın alma doğrulanamadı. Ücret alındıysa Google otomatik iade eder.',
+      'ACCOUNT_MISMATCH' || 'TOKEN_ALREADY_USED' => 'Bu satın alma başka bir kuruluma ait.',
       'NO_SERVER' => 'Sunucu ayarlı değil. Bu sürümde çevrimiçi oda kapalı.',
       'ROOM_NOT_FOUND' => 'Oda bulunamadı. Kodu kontrol et.',
       'ROOM_FULL' => 'Oda dolu.',
@@ -52,6 +57,9 @@ class OdaGirisi {
   final String rol;
   final String? resumeToken;
 }
+
+/// Kurulum kimliğinin SHA-256 özeti (Play `obfuscatedAccountId`; sunucudaki `kimlikOzeti` ile aynı).
+String kimlikOzeti(String installId) => sha256.convert(utf8.encode(installId)).toString();
 
 /// Uygulama kurulumuna özgü rastgele kimlik (hesap yok). Silinirse yenisi üretilir.
 Future<String> installIdAl() async {
@@ -121,6 +129,7 @@ Future<OdaGirisi> odaKur({
   required String installId,
   Map<String, dynamic>? ayarlar,
   bool premium = false,
+  String? passToken,
 }) async {
   final j = await _istek('POST', '/v1/rooms', {
     'game': oyunId,
@@ -128,6 +137,7 @@ Future<OdaGirisi> odaKur({
     'installId': installId,
     'settings': ?ayarlar,
     'premium': premium,
+    'passToken': ?passToken,
   });
   final kod = j['code'] as String;
   return OdaGirisi(
@@ -137,6 +147,16 @@ Future<OdaGirisi> odaKur({
     installId: installId,
     resumeToken: j['joinToken'] as String?,
   );
+}
+
+/// Doğrulanmış Play satın almasını sunucuda 4 saatlik geçişe çevirir; geçiş kimliğini döner.
+Future<String> gecisBozdur({required String purchaseToken, required String installId}) async {
+  final j = await _istek('POST', '/v1/passes/redeem', {
+    'purchaseToken': purchaseToken,
+    'productId': 'oda_gecisi_4s',
+    'installId': installId,
+  });
+  return (j['pass'] as Map)['id'] as String;
 }
 
 /// Katılmadan önce oda özeti (var mı, dolu mu).

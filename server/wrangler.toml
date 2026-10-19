@@ -7,6 +7,14 @@ compatibility_date = "2025-01-01"
 name = "ODA"
 class_name = "OdaNesnesi"
 
+[[durable_objects.bindings]]
+name = "GECIS"
+class_name = "GecisNesnesi"
+
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["OdaNesnesi"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["GecisNesnesi"]

@@ -7,6 +7,10 @@ export interface Env {
   ODA: DurableObjectNamespace;
   /** 'acik': oda kurma kapısı kapalı (geliştirme). Üretimde satın alma doğrulaması gerekir. */
   GECIS_KAPISI?: string;
+  GECIS: DurableObjectNamespace<import('./gecisNesnesi.ts').GecisNesnesi>;
+  /** Google Play hizmet hesabı JSON'u (Worker gizli değişkeni; depoya girmez). */
+  PLAY_HIZMET_HESABI?: string;
+  PLAY_PAKET?: string;
 }
 
 interface SoketEki {

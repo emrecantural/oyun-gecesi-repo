@@ -18,6 +18,6 @@ Bilinen eksikler:
 - İçerik CSV'lerindeki tüm satırlar `taslak`; editör onayı olmadan release AAB içerik taşımaz.
 - Sunucu: Play satın alma doğrulaması yok → oda kurma `GECIS_KAPISI=acik` ile açılır, yoksa `402 NO_ROOM_RIGHT`; `/v1/passes/redeem` 501. Takma ad yasaklı listesi yer tutucudur.
 - 07 oda: kurucunun premium bildirimi istemci tarafında doğrulanır (kabul edilen risk). Tombala sesli okuma yok.
-- İstemci: oda panelleri cihazda denenmedi (03 oda rol paketi düzenleyicisi var, yerel PASS modunda yok); 24 Gizli Hediye'de şifreli depolama yok; 23 Yeni Yıl Kehaneti çıkarıldı, yerine 20 Hafıza Düellosu (tek cihaz) geldi (D-052); yazı tipi ve ses varlıkları yok.
-- Para kazanma: AdMob test kimlikleri, UMP rızası, Premium satın alma (ürün Play'de tanımlı değil), geçiş reklamı sıklık kuralları kodda; 4 saatlik oda geçişi satın alma istemcisi yok (sunucu doğrulaması yokken eklenmedi). Premium iade tespiti yok.
+- İstemci: oda panelleri cihazda denenmedi (03 oda rol paketi düzenleyicisi var, yerel PASS modunda yok); 24 Gizli Hediye eşleşmeyi cihaza yazmaz (D-053); 23 Yeni Yıl Kehaneti çıkarıldı, yerine 20 Hafıza Düellosu (tek cihaz) geldi (D-052); yazı tipi ve ses varlıkları yok.
+- Para kazanma: AdMob test kimlikleri, UMP rızası, Premium satın alma (ürün Play'de tanımlı değil), geçiş reklamı sıklık kuralları kodda; 4 saatlik oda geçişi: istemci satın alma + sunucu defteri/Play doğrulaması kodda, ama hiç gerçek Play hesabıyla denenmedi ve hizmet hesabı tanımlanana dek sunucu 501 döner. Premium iade tespiti yok.
 - Yayın: imzalama anahtarı yok (release AAB hata ayıklama imzalı); mağaza gönderimi yapılmadı.

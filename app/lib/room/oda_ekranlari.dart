@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../app/premium.dart';
 import '../app/theme.dart';
 import '../games/registry.dart';
+import '../monetization/oda_gecisi.dart';
 import '../platform/secure_screen.dart';
 import '../shell/ortak/oyuncular.dart';
 import 'oda_istemci.dart';
@@ -61,6 +62,7 @@ class _OdaKurDurum extends ConsumerState<OdaKurEkrani> {
         takmaAd: ad,
         installId: id,
         premium: ref.read(premiumProvider),
+        passToken: ref.read(odaGecisiProvider).gecisId,
       );
       if (!mounted) return;
       context.pushReplacement('/oda/${giris.kod}', extra: giris);
@@ -69,6 +71,24 @@ class _OdaKurDurum extends ConsumerState<OdaKurEkrani> {
     } finally {
       if (mounted) setState(() => _mesgul = false);
     }
+  }
+
+  Widget _gecisKutusu() {
+    final g = ref.read(odaGecisiProvider);
+    return ListenableBuilder(
+      listenable: g,
+      builder: (context, _) => Padding(
+        padding: const EdgeInsets.only(top: 12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          if (g.mesaj != null) Text(g.mesaj!),
+          if (g.satinAlinabilir)
+            OutlinedButton(
+              onPressed: g.mesgul ? null : g.satinAl,
+              child: Text('4 saatlik oda geçişi · ${g.fiyat}'),
+            ),
+        ]),
+      ),
+    );
   }
 
   @override
@@ -90,6 +110,7 @@ class _OdaKurDurum extends ConsumerState<OdaKurEkrani> {
                 decoration: const InputDecoration(labelText: 'Takma adın'),
               ),
               if (_hata != null) _Uyari(metin: hataMetni(_hata)),
+              if (_hata == 'NO_ROOM_RIGHT' || ref.read(odaGecisiProvider).mesaj != null) _gecisKutusu(),
               const Spacer(),
               FilledButton(
                 onPressed: _mesgul || !sunucuAyarli ? null : _kur,

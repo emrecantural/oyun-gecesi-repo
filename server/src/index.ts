@@ -2,7 +2,11 @@ import { odaKodu, guvenliRand } from './core/rng.ts';
 import { oyunTanimi } from './games/index.ts';
 import type { Env } from './odaNesnesi.ts';
 
+import { gecisBozdur, kimlikOzeti } from './gecis.ts';
+import { GooglePlay } from './play.ts';
+
 export { OdaNesnesi } from './odaNesnesi.ts';
+export { GecisNesnesi } from './gecisNesnesi.ts';
 
 const KOD_RE = /^[2-9A-HJKMNP-Z]{6}$/;
 
@@ -37,8 +41,12 @@ export default {
       if (typeof b.installId !== 'string' || b.installId.length < 8 || b.installId.length > 64) {
         return json({ error: 'INVALID_MESSAGE' }, 400);
       }
-      // Oda hakkı kapısı: satın alma/deneme doğrulaması Play Developer API ve hesap bilgileri gerektirir (henüz yok).
-      if (env.GECIS_KAPISI !== 'acik') return json({ error: 'NO_ROOM_RIGHT' }, 402);
+      // Oda hakkı: geliştirme kapısı, geçerli 4 saatlik geçiş (passToken) ya da kurulum başına bir ücretsiz deneme (D-022).
+      const defter = env.GECIS.get(env.GECIS.idFromName('defter'));
+      const install = kimlikOzeti(b.installId);
+      const passToken = typeof b.passToken === 'string' ? b.passToken : undefined;
+      const hak = env.GECIS_KAPISI === 'acik' ? null : await defter.bak(passToken, install);
+      if (env.GECIS_KAPISI !== 'acik' && hak === null) return json({ error: 'NO_ROOM_RIGHT' }, 402);
       const rand = guvenliRand();
       for (let deneme = 0; deneme < 5; deneme++) {
         const code = odaKodu(rand);
@@ -56,6 +64,7 @@ export default {
         if (r.status === 409) continue;
         if (!r.ok) return json(await r.json(), r.status);
         const { joinToken } = (await r.json()) as { joinToken: string };
+        if (hak !== null) await defter.kullan(hak, passToken, install);
         return json(
           { code, joinToken, wsUrl: `wss://${url.host}/v1/ws/${code}`, role: 'host', expiresAt: Date.now() + 6 * 3600_000 },
           201,
@@ -65,8 +74,17 @@ export default {
     }
 
     if (yol === '/v1/passes/redeem' && request.method === 'POST') {
-      // Google Play Developer API doğrulaması hizmet hesabı gerektirir; yapılandırılana dek kapalı.
-      return json({ error: 'PURCHASE_INVALID' }, 501);
+      // Hizmet hesabı yapılandırılana dek kapalı (Play hesabı kullanıcıda).
+      if (!env.PLAY_HIZMET_HESABI || !env.PLAY_PAKET) return json({ error: 'PURCHASE_INVALID' }, 501);
+      let g: Record<string, unknown>;
+      try {
+        g = (await request.json()) as Record<string, unknown>;
+      } catch {
+        return json({ error: 'INVALID_MESSAGE' }, 400);
+      }
+      const defter = env.GECIS.get(env.GECIS.idFromName('defter'));
+      const y = await gecisBozdur(g, new GooglePlay(env.PLAY_HIZMET_HESABI, env.PLAY_PAKET), defter);
+      return json(y.body, y.status);
     }
 
     const oda = /^\/v1\/rooms\/([A-Za-z0-9]{6})$/.exec(yol);
