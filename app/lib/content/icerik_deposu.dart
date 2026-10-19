@@ -9,6 +9,13 @@ import 'icerik.dart';
 const bool icerikTaslakDahil =
     bool.fromEnvironment('ICERIK_TASLAK', defaultValue: false);
 
+/// Paket filtresiz, ham içerik (özel bölme kuralı olan oyunlar için).
+final icerikHamProvider =
+    FutureProvider.family<List<IcerikOgesi>, String>((ref, dosya) async {
+  final csv = await rootBundle.loadString('assets/icerik/$dosya.csv');
+  return icerikAyristir(csv, taslakDahil: icerikTaslakDahil);
+});
+
 /// Tüm içeriği ([premium] false ise ücretsiz havuzu) yükler.
 final icerikProvider =
     FutureProvider.family<List<IcerikOgesi>, String>((ref, dosya) async {
