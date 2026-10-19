@@ -7,6 +7,7 @@ import 'en_olasi_kim/en_olasi_kim.dart';
 import 'gece_yarisi_sorgusu/gece_yarisi_sorgusu.dart';
 import 'geri_sayimi_yakala/geri_sayimi_yakala.dart';
 import 'gizli_hediye/gizli_hediye.dart';
+import 'hafiza_duellosu/hafiza_duellosu.dart';
 import 'hic_yapmadim_ki/hic_yapmadim_ki.dart';
 import 'kelime_zinciri/kelime_zinciri.dart';
 import 'kim_casus/kim_casus.dart';
@@ -15,7 +16,6 @@ import 'oyun_uygulamasi.dart';
 import 'sarki_mirildan/sarki_mirildan.dart';
 import 'tek_kelime/tek_kelime.dart';
 import 'yasak_kelime/yasak_kelime.dart';
-import 'yeni_yil_kehaneti/yeni_yil_kehaneti.dart';
 
 /// Çalışan (uygulanmış) oyunlar; kayıt dışı olanlar "Yakında" görünür.
 final Map<String, OyunUygulamasi> _uygulamalar = {
@@ -26,7 +26,7 @@ final Map<String, OyunUygulamasi> _uygulamalar = {
   gizliHediye.id: gizliHediye,
   kimCasus.id: kimCasus,
   geceYarisiSorgusu.id: geceYarisiSorgusu,
-  yeniYilKehaneti.id: yeniYilKehaneti,
+  hafizaDuellosu.id: hafizaDuellosu,
   alnimdakiKim.id: alnimdakiKim,
   birbirimiziTaniyoruz.id: birbirimiziTaniyoruz,
   bilgiYarismasi.id: bilgiYarismasi,
