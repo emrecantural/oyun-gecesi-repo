@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../app/theme.dart';
 import 'oda_istemci.dart';
 import 'oda_ortak.dart';
+import 'sayi_yazi.dart';
 import 'zarf.dart';
 
 const _odulTurAdi = {'cinko1': '1. Çinko', 'cinko2': '2. Çinko', 'tombala': 'Tombala'};
@@ -13,16 +14,140 @@ List<int> _cekilenler(OdaIstemcisi i) =>
     ((i.acik['drawn'] as List?) ?? const []).map((e) => (e as num).toInt()).toList();
 
 /// 01 — Tombala çevrimiçi oda paneli (oyuncu kartı / HOST ekranı).
-class TombalaPaneli extends StatelessWidget {
+class TombalaPaneli extends StatefulWidget {
   const TombalaPaneli({super.key, required this.istemci});
   final OdaIstemcisi istemci;
 
   @override
+  State<TombalaPaneli> createState() => _TombalaPaneliDurum();
+}
+
+class _TombalaPaneliDurum extends State<TombalaPaneli> {
+  /// Oda sahibi aynı cihazı HOST ekranı gibi kullanabilir (D-024).
+  bool _ekranGorunumu = false;
+
+  @override
   Widget build(BuildContext context) {
-    final i = istemci;
+    final i = widget.istemci;
     if (i.faz == 'FINAL') return _TombalaFinal(istemci: i);
-    if (i.rol == 'display') return _Ekran(istemci: i);
-    return _Oyuncu(istemci: i);
+    final ekran = i.rol == 'display' || _ekranGorunumu;
+    return _OdulOrtusu(
+      istemci: i,
+      buyuk: ekran,
+      child: Column(
+        children: [
+          if (i.acik['paused'] == true)
+            Semantics(
+              liveRegion: true,
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                color: Theme.of(context).colorScheme.tertiaryContainer,
+                alignment: Alignment.center,
+                child: const Text('Duraklatıldı'),
+              ),
+            ),
+          if (i.hostMu && i.rol != 'display')
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () => setState(() => _ekranGorunumu = !_ekranGorunumu),
+                icon: Icon(_ekranGorunumu ? Icons.style_rounded : Icons.tv_rounded),
+                label: Text(_ekranGorunumu ? 'Kartıma dön' : 'Ekran görünümü'),
+              ),
+            ),
+          Expanded(child: ekran ? _Ekran(istemci: i) : _Oyuncu(istemci: i)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Yeni bir ödül kazanıldığında 4 sn'lik örtü (O01-3): HOST'ta büyük, oyuncuda üst şerit.
+class _OdulOrtusu extends StatefulWidget {
+  const _OdulOrtusu({required this.istemci, required this.buyuk, required this.child});
+  final OdaIstemcisi istemci;
+  final bool buyuk;
+  final Widget child;
+
+  @override
+  State<_OdulOrtusu> createState() => _OdulOrtusuDurum();
+}
+
+class _OdulOrtusuDurum extends State<_OdulOrtusu> {
+  final Set<String> _gorulen = {};
+  bool _ilk = true;
+  String? _metin;
+  Timer? _zaman;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.istemci.addListener(_kontrol);
+    _kontrol();
+  }
+
+  @override
+  void dispose() {
+    widget.istemci.removeListener(_kontrol);
+    _zaman?.cancel();
+    super.dispose();
+  }
+
+  void _kontrol() {
+    final i = widget.istemci;
+    final oduller = ((i.acik['prizes'] as List?) ?? const []).cast<Map<String, dynamic>>();
+    final yeni = <String>[];
+    for (final o in oduller) {
+      for (final w in ((o['winners'] as List?) ?? const [])) {
+        final anahtar = '${o['tur']}:$w';
+        if (_gorulen.add(anahtar) && !_ilk) {
+          yeni.add('${o['name']}: ${oyuncuAdi(i, w as String)}');
+        }
+      }
+    }
+    // Sayfaya yeni girenin (yeniden bağlanan) geçmiş kazananları örtü açmaz.
+    _ilk = false;
+    if (yeni.isEmpty || !mounted) return;
+    setState(() => _metin = yeni.join('\n'));
+    _zaman?.cancel();
+    _zaman = Timer(const Duration(seconds: 4), () {
+      if (mounted) setState(() => _metin = null);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final r = context.renkler;
+    return Stack(
+      children: [
+        widget.child,
+        if (_metin != null)
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: widget.buyuk ? 0 : null,
+            child: Semantics(
+              liveRegion: true,
+              child: Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(16),
+                color: widget.buyuk ? r.ana.withAlpha(235) : r.ana,
+                child: Text(
+                  _metin!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    fontSize: widget.buyuk ? 48 : 20,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 }
 
@@ -301,7 +426,7 @@ class _HostKumanda extends StatelessWidget {
   }
 }
 
-/// Büyük ekran: son sayı, 1–90 tablosu, ödüller.
+/// Büyük ekran (HOST): son sayı + yazıyla, 1–90 tablosu, ödüller, durum şeridi. Yatayda iki sütun.
 class _Ekran extends StatelessWidget {
   const _Ekran({required this.istemci});
   final OdaIstemcisi istemci;
@@ -310,43 +435,100 @@ class _Ekran extends StatelessWidget {
   Widget build(BuildContext context) {
     final i = istemci;
     final cekilen = _cekilenler(i).toSet();
-    final guncel = i.acik['current'];
+    final guncel = (i.acik['current'] as num?)?.toInt();
     final oduller = ((i.acik['prizes'] as List?) ?? const []).cast<Map<String, dynamic>>();
     final r = context.renkler;
-    return Padding(
-      padding: const EdgeInsets.all(16),
+    final oyuncuSayisi = i.oyuncular.where((o) => o.rol == 'player').length;
+
+    final sayi = Semantics(
+      liveRegion: true,
+      label: guncel == null ? 'Henüz sayı çekilmedi' : 'Yeni sayı ${sayiYazi(guncel)}',
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            guncel == null ? '—' : '$guncel',
-            style: TextStyle(fontSize: 120, fontWeight: FontWeight.w900, color: r.ana),
-          ),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: 10,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-              children: [
-                for (var n = 1; n <= 90; n++)
-                  Container(
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                      color: cekilen.contains(n) ? r.ana : r.yukseltilmis,
-                    ),
-                    child: Text(
-                      '$n',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: cekilen.contains(n) ? Colors.white : r.metinIkincil,
-                      ),
-                    ),
-                  ),
-              ],
+          FittedBox(
+            child: Text(
+              guncel == null ? '—' : '$guncel',
+              style: TextStyle(fontSize: 120, fontWeight: FontWeight.w900, color: r.ana),
             ),
           ),
-          _OdulListesi(istemci: i, oduller: oduller),
+          if (guncel != null)
+            Text(
+              sayiYazi(guncel),
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: r.metinIkincil),
+            ),
         ],
+      ),
+    );
+    final tablo = GridView.count(
+      crossAxisCount: 10,
+      mainAxisSpacing: 4,
+      crossAxisSpacing: 4,
+      children: [
+        for (var n = 1; n <= 90; n++)
+          Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              color: cekilen.contains(n) ? r.ana : r.yukseltilmis,
+            ),
+            child: Text(
+              '$n',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: cekilen.contains(n) ? Colors.white : r.metinIkincil,
+              ),
+            ),
+          ),
+      ],
+    );
+    final alt = Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Text(
+        'Oyuncu: $oyuncuSayisi   Çekim: ${cekilen.length}/90   Oda: ${i.kod}',
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+    );
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final yatay = c.maxWidth > c.maxHeight && c.maxWidth >= 640;
+          if (yatay) {
+            return Column(
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: Column(
+                          children: [
+                            sayi,
+                            const SizedBox(height: 8),
+                            Expanded(child: SingleChildScrollView(child: _OdulListesi(istemci: i, oduller: oduller))),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(flex: 6, child: tablo),
+                    ],
+                  ),
+                ),
+                alt,
+              ],
+            );
+          }
+          return Column(
+            children: [
+              sayi,
+              Expanded(child: tablo),
+              _OdulListesi(istemci: i, oduller: oduller),
+              alt,
+            ],
+          );
+        },
       ),
     );
   }
