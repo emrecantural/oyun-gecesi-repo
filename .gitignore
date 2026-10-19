@@ -1,0 +1,20 @@
+# Flutter / Dart
+.dart_tool/
+.packages
+build/
+*.iml
+.idea/
+.flutter-plugins
+.flutter-plugins-dependencies
+# CI üretir (tool/patch_android.py); depoda tutulmaz
+app/android/
+app/.metadata
+app/*.lock.bak
+# Sırlar
+*.jks
+*.keystore
+key.properties
+.dev.vars
+.env
+# Node
+node_modules/
