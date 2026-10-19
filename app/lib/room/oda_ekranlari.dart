@@ -13,6 +13,7 @@ import 'oda_ortak.dart';
 import 'oda_servisi.dart';
 import 'oyun_en_olasi_kim.dart';
 import 'oyun_koy_kurtlar.dart';
+import 'oyun_koy_paket.dart';
 import 'oyun_tombala.dart';
 import 'zarf.dart';
 
@@ -485,6 +486,13 @@ class _Lobi extends StatelessWidget {
             onPressed: () => _ayarlar(context, i),
             child: const Text('Oyun ayarları'),
           ),
+          if (i.oyunId == '03') ...[
+            const SizedBox(height: 8),
+            OutlinedButton(
+              onPressed: () => rolPaketiAc(context, i, oyuncular.length),
+              child: const Text('Rol paketi'),
+            ),
+          ],
           const SizedBox(height: 8),
           FilledButton(
             onPressed: oyuncular.length >= min ? () => i.gonder('start') : null,
