@@ -1,6 +1,7 @@
 import 'alnimdaki_kim/alnimdaki_kim.dart';
 import 'bilgi_yarismasi/bilgi_yarismasi.dart';
 import 'birbirimizi_taniyoruz/birbirimizi_taniyoruz.dart';
+import 'dilsiz_sinema/dilsiz_sinema.dart';
 import 'dogruluk_cesaret/dogruluk_cesaret.dart';
 import 'en_olasi_kim/en_olasi_kim.dart';
 import 'gece_yarisi_sorgusu/gece_yarisi_sorgusu.dart';
@@ -28,6 +29,7 @@ final Map<String, OyunUygulamasi> _uygulamalar = {
   bilgiYarismasi.id: bilgiYarismasi,
   tekKelime.id: tekKelime,
   yasakKelime.id: yasakKelime,
+  dilsizSinema.id: dilsizSinema,
 };
 
 OyunUygulamasi? oyunUygulamasi(String id) => _uygulamalar[id];
