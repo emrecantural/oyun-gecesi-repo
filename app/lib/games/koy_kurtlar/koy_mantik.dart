@@ -75,23 +75,31 @@ class KoyOyunu {
     Map<Rol, int>? rolPaketi,
     this.ayar = const KoyAyarlar(),
     int? tohum,
+    List<Rol>? rolDagitimi,
   }) : oyuncular = List.of(oyuncuIdleri) {
     final n = oyuncuIdleri.length;
-    final paket = rolPaketi ?? varsayilanRolPaketi(n);
-    if (paket.values.fold<int>(0, (a, b) => a + b) != n) {
-      throw KoyHatasi('ROLEPACK_MISMATCH');
-    }
-    final havuz = <Rol>[
-      for (final e in paket.entries)
-        for (var i = 0; i < e.value; i++) e.key
-    ];
-    final rng = Random(tohum);
-    // Fisher–Yates
-    for (var i = havuz.length - 1; i > 0; i--) {
-      final j = rng.nextInt(i + 1);
-      final t = havuz[i];
-      havuz[i] = havuz[j];
-      havuz[j] = t;
+    final List<Rol> havuz;
+    if (rolDagitimi != null) {
+      // Altın vektörler ve testler için: i. oyuncu i. rolü alır, karıştırma yok.
+      if (rolDagitimi.length != n) throw KoyHatasi('ROLEPACK_MISMATCH');
+      havuz = List.of(rolDagitimi);
+    } else {
+      final paket = rolPaketi ?? varsayilanRolPaketi(n);
+      if (paket.values.fold<int>(0, (a, b) => a + b) != n) {
+        throw KoyHatasi('ROLEPACK_MISMATCH');
+      }
+      havuz = <Rol>[
+        for (final e in paket.entries)
+          for (var i = 0; i < e.value; i++) e.key
+      ];
+      final rng = Random(tohum);
+      // Fisher–Yates
+      for (var i = havuz.length - 1; i > 0; i--) {
+        final j = rng.nextInt(i + 1);
+        final t = havuz[i];
+        havuz[i] = havuz[j];
+        havuz[j] = t;
+      }
     }
     for (var i = 0; i < n; i++) {
       roller[oyuncuIdleri[i]] = havuz[i];

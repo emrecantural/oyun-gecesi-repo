@@ -1,0 +1,824 @@
+{
+ "surum": 1,
+ "aciklama": "Köy ve Kurtlar motoru altın vektörleri. Hem Dart (app/test/koy_altin_test.dart) hem TypeScript (server/test/golden.test.ts) bunları çalıştırır. Oyuncu kimlikleri 1..n; roller i. oyuncuya i. rol olarak verilir.",
+ "vektorler": [
+  {
+   "ad": "koruma kurbanı kurtarır",
+   "n": 6,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 1,
+     "hedef": 5
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 2,
+     "hedef": 5
+    },
+    {
+     "op": "koru",
+     "actor": 4,
+     "hedef": 5
+    },
+    {
+     "op": "coz",
+     "bekle": {
+      "olumler": [],
+      "avci": null
+     }
+    },
+    {
+     "op": "kazanan",
+     "bekle": null
+    }
+   ]
+  },
+  {
+   "ad": "kurt hedefi korunmazsa ölür",
+   "n": 6,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 1,
+     "hedef": 5
+    },
+    {
+     "op": "coz",
+     "bekle": {
+      "olumler": [
+       [
+        5,
+        "kurt"
+       ]
+      ],
+      "avci": null
+     }
+    }
+   ]
+  },
+  {
+   "ad": "kurt oyları eşitse kurban yok",
+   "n": 6,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 1,
+     "hedef": 5
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 2,
+     "hedef": 6
+    },
+    {
+     "op": "coz",
+     "bekle": {
+      "olumler": [],
+      "avci": null
+     }
+    }
+   ]
+  },
+  {
+   "ad": "kurt kurda oy veremez",
+   "n": 6,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 1,
+     "hedef": 2,
+     "hata": "INVALID_TARGET"
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 5,
+     "hedef": 1,
+     "hata": "NOT_YOUR_ROLE"
+    }
+   ]
+  },
+  {
+   "ad": "kâhin sorgusu bir kez; sonuç doğru",
+   "n": 6,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kahin",
+     "actor": 3,
+     "hedef": 1,
+     "bekle": true
+    },
+    {
+     "op": "kahin",
+     "actor": 3,
+     "hedef": 5,
+     "hata": "ALREADY_ACTED"
+    },
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kahin",
+     "actor": 3,
+     "hedef": 5,
+     "bekle": false
+    },
+    {
+     "op": "kahin",
+     "actor": 3,
+     "hedef": 3,
+     "hata": "INVALID_TARGET"
+    }
+   ]
+  },
+  {
+   "ad": "doktor art arda aynı kişiyi koruyamaz",
+   "n": 6,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "gece"
+    },
+    {
+     "op": "koru",
+     "actor": 4,
+     "hedef": 5
+    },
+    {
+     "op": "coz",
+     "bekle": {
+      "olumler": [],
+      "avci": null
+     }
+    },
+    {
+     "op": "gece"
+    },
+    {
+     "op": "koru",
+     "actor": 4,
+     "hedef": 5,
+     "hata": "DOCTOR_REPEAT"
+    },
+    {
+     "op": "koru",
+     "actor": 4,
+     "hedef": 6
+    }
+   ]
+  },
+  {
+   "ad": "doktor kendini koruma kapalı",
+   "n": 6,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {
+    "doktorKendiniKorur": false
+   },
+   "adimlar": [
+    {
+     "op": "gece"
+    },
+    {
+     "op": "koru",
+     "actor": 4,
+     "hedef": 4,
+     "hata": "DOCTOR_SELF_OFF"
+    }
+   ]
+  },
+  {
+   "ad": "cadı iyileştirme ölümü geri alır, zehir öldürür, iksir bir kez",
+   "n": 12,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "cadi",
+    "avci",
+    "koylu",
+    "koylu",
+    "koylu",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 1,
+     "hedef": 8
+    },
+    {
+     "op": "iyilestir",
+     "actor": 6
+    },
+    {
+     "op": "zehirle",
+     "actor": 6,
+     "hedef": 9
+    },
+    {
+     "op": "coz",
+     "bekle": {
+      "olumler": [
+       [
+        9,
+        "zehir"
+       ]
+      ],
+      "avci": null
+     }
+    },
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 1,
+     "hedef": 8
+    },
+    {
+     "op": "iyilestir",
+     "actor": 6,
+     "hata": "POTION_USED"
+    },
+    {
+     "op": "zehirle",
+     "actor": 6,
+     "hedef": 10,
+     "hata": "POTION_USED"
+    }
+   ]
+  },
+  {
+   "ad": "iyileştirme için kurban gerekir",
+   "n": 12,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "cadi",
+    "avci",
+    "koylu",
+    "koylu",
+    "koylu",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "gece"
+    },
+    {
+     "op": "iyilestir",
+     "actor": 6,
+     "hata": "INVALID_TARGET"
+    }
+   ]
+  },
+  {
+   "ad": "zehir korumayı aşar; kurt hedefi ve zehir ikisi de ölebilir",
+   "n": 12,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "cadi",
+    "avci",
+    "koylu",
+    "koylu",
+    "koylu",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 1,
+     "hedef": 8
+    },
+    {
+     "op": "koru",
+     "actor": 5,
+     "hedef": 8
+    },
+    {
+     "op": "zehirle",
+     "actor": 6,
+     "hedef": 8
+    },
+    {
+     "op": "coz",
+     "bekle": {
+      "olumler": [
+       [
+        8,
+        "zehir"
+       ]
+      ],
+      "avci": null
+     }
+    }
+   ]
+  },
+  {
+   "ad": "kurt ve zehir farklı hedef: ikisi de ölür",
+   "n": 12,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "cadi",
+    "avci",
+    "koylu",
+    "koylu",
+    "koylu",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 1,
+     "hedef": 8
+    },
+    {
+     "op": "zehirle",
+     "actor": 6,
+     "hedef": 9
+    },
+    {
+     "op": "coz",
+     "bekle": {
+      "olumler": [
+       [
+        8,
+        "kurt"
+       ],
+       [
+        9,
+        "zehir"
+       ]
+      ],
+      "avci": null
+     }
+    }
+   ]
+  },
+  {
+   "ad": "âşık zinciri ve avcı",
+   "n": 10,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "avci",
+    "asik",
+    "asik",
+    "koylu",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 1,
+     "hedef": 6
+    },
+    {
+     "op": "coz",
+     "bekle": {
+      "olumler": [
+       [
+        6,
+        "kurt"
+       ],
+       [
+        7,
+        "askZinciri"
+       ]
+      ],
+      "avci": null
+     }
+    },
+    {
+     "op": "kazanan",
+     "bekle": null
+    }
+   ]
+  },
+  {
+   "ad": "avcı ölünce avcı bekler; vurulanın eşi de ölür",
+   "n": 10,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "avci",
+    "asik",
+    "asik",
+    "koylu",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 1,
+     "hedef": 5
+    },
+    {
+     "op": "coz",
+     "bekle": {
+      "olumler": [
+       [
+        5,
+        "kurt"
+       ]
+      ],
+      "avci": 5
+     }
+    },
+    {
+     "op": "avciVur",
+     "actor": 5,
+     "hedef": 6,
+     "bekle": [
+      [
+       6,
+       "avci"
+      ],
+      [
+       7,
+       "askZinciri"
+      ]
+     ]
+    },
+    {
+     "op": "avciVur",
+     "actor": 1,
+     "hedef": 8,
+     "hata": "NOT_YOUR_ROLE"
+    }
+   ]
+  },
+  {
+   "ad": "oylama: en çok oy elenir, rol ve zincir",
+   "n": 10,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "avci",
+    "asik",
+    "asik",
+    "koylu",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "oyBaslat"
+    },
+    {
+     "op": "oyVer",
+     "voter": 1,
+     "hedef": 6
+    },
+    {
+     "op": "oyVer",
+     "voter": 2,
+     "hedef": 6
+    },
+    {
+     "op": "oyVer",
+     "voter": 3,
+     "hedef": 8
+    },
+    {
+     "op": "oyVer",
+     "voter": 8,
+     "hedef": 8,
+     "hata": "SELF_TARGET_FORBIDDEN"
+    },
+    {
+     "op": "oyBitir",
+     "bekle": {
+      "olumler": [
+       [
+        6,
+        "oylama"
+       ],
+       [
+        7,
+        "askZinciri"
+       ]
+      ],
+      "avci": null,
+      "esit": []
+     }
+    }
+   ]
+  },
+  {
+   "ad": "oylama eşitliği: kimse elenmez, eşit adaylar döner",
+   "n": 6,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "oyBaslat"
+    },
+    {
+     "op": "oyVer",
+     "voter": 1,
+     "hedef": 5
+    },
+    {
+     "op": "oyVer",
+     "voter": 2,
+     "hedef": 6
+    },
+    {
+     "op": "oyBitir",
+     "bekle": {
+      "olumler": [],
+      "avci": null,
+      "esit": [
+       5,
+       6
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "ad": "kimse oy vermezse kimse elenmez",
+   "n": 6,
+   "roller": [
+    "kurt",
+    "kurt",
+    "kahin",
+    "doktor",
+    "koylu",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "oyBaslat"
+    },
+    {
+     "op": "oyVer",
+     "voter": 1,
+     "hedef": null
+    },
+    {
+     "op": "oyBitir",
+     "bekle": {
+      "olumler": [],
+      "avci": null,
+      "esit": []
+     }
+    }
+   ]
+  },
+  {
+   "ad": "kazanma: son kurt elenince köy",
+   "n": 6,
+   "roller": [
+    "kurt",
+    "koylu",
+    "koylu",
+    "koylu",
+    "kahin",
+    "doktor"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "oyBaslat"
+    },
+    {
+     "op": "oyVer",
+     "voter": 2,
+     "hedef": 1
+    },
+    {
+     "op": "oyVer",
+     "voter": 3,
+     "hedef": 1
+    },
+    {
+     "op": "oyBitir",
+     "bekle": {
+      "olumler": [
+       [
+        1,
+        "oylama"
+       ]
+      ],
+      "avci": null,
+      "esit": []
+     }
+    },
+    {
+     "op": "kazanan",
+     "bekle": "koy"
+    }
+   ]
+  },
+  {
+   "ad": "kazanma: kurt sayısı diğerlerine eşitse kurtlar",
+   "n": 6,
+   "roller": [
+    "kurt",
+    "kurt",
+    "koylu",
+    "koylu",
+    "koylu",
+    "kahin"
+   ],
+   "ayar": {},
+   "adimlar": [
+    {
+     "op": "kazanan",
+     "bekle": null
+    },
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 1,
+     "hedef": 3
+    },
+    {
+     "op": "coz",
+     "bekle": {
+      "olumler": [
+       [
+        3,
+        "kurt"
+       ]
+      ],
+      "avci": null
+     }
+    },
+    {
+     "op": "kazanan",
+     "bekle": null
+    },
+    {
+     "op": "gece"
+    },
+    {
+     "op": "kurtOyu",
+     "actor": 1,
+     "hedef": 4
+    },
+    {
+     "op": "coz",
+     "bekle": {
+      "olumler": [
+       [
+        4,
+        "kurt"
+       ]
+      ],
+      "avci": null
+     }
+    },
+    {
+     "op": "kazanan",
+     "bekle": "kurtlar"
+    }
+   ]
+  },
+  {
+   "ad": "rol paketi uyuşmazlığı",
+   "n": 6,
+   "roller": [
+    "kurt",
+    "koylu"
+   ],
+   "ayar": {},
+   "adimlar": [],
+   "bekleHata": "ROLEPACK_MISMATCH"
+  }
+ ]
+}

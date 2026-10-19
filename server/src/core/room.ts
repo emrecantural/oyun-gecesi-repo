@@ -591,6 +591,7 @@ export class Oda {
         return { ok: true };
       }
       case 'reaction': {
+        if (this.game.tepkiAcik && !this.game.tepkiAcik(this.baglam())) return { err: 'REACTION_DISABLED' };
         const e = typeof p.emoji === 'string' ? p.emoji : '';
         if (!EMOJILER.includes(e)) return { err: 'INVALID_MESSAGE' };
         const simdi = this.dep.now();

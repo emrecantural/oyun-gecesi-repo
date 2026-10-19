@@ -37,7 +37,7 @@ export type Sonuc = { ok: true } | { err: string };
 export const TAMAM: Sonuc = { ok: true };
 export const hata = (kod: string): Sonuc => ({ err: kod });
 
-export type Ayarlar = Record<string, string | number | boolean>;
+export type Ayarlar = Record<string, unknown>;
 
 export interface OyunBaglami {
   now(): number;
@@ -72,6 +72,8 @@ export interface Oyun {
   ozel(ctx: OyunBaglami, playerId: string): unknown;
   /** Oyuncu girdi/çıktı/kopma/dönüş. */
   oyuncuDegisti(ctx: OyunBaglami, olay: 'join' | 'leave' | 'disconnect' | 'reconnect', o: Player): void;
+  /** Tepki (emoji) bu fazda açık mı? Tanımlı değilse açık. */
+  tepkiAcik?(ctx: OyunBaglami): boolean;
   toJSON(): unknown;
 }
 
