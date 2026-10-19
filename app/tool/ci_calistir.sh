@@ -10,4 +10,13 @@ if [ $kod -ne 0 ]; then
     echo "::error::${satir}"
   done
 fi
+if [ $kod -ne 0 ]; then
+  # Gradle: "What went wrong" bloğu ve nedeni
+  echo "$cikti" | grep -A12 "What went wrong" | head -30 | while IFS= read -r satir; do
+    echo "::error::${satir}"
+  done
+  echo "$cikti" | grep -iE "minSdk|manifest merger|Could not (find|resolve|get)|requires|incompatible|namespace|Duplicate class" | head -15 | while IFS= read -r satir; do
+    echo "::error::${satir}"
+  done
+fi
 exit $kod
