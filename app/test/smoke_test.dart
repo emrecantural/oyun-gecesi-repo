@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:oyungecesi/app/app.dart';
 import 'package:oyungecesi/app/settings.dart';
 import 'package:oyungecesi/games/registry.dart';
+import 'package:oyungecesi/shell/kural_kartlari.dart';
 
 void main() {
   test('oyun kayıtları tutarlı', () {
@@ -13,10 +14,22 @@ void main() {
     }
   });
 
+  test('her oyunun kural kartı ve süresi var', () {
+    for (final o in oyunlar) {
+      expect(kuralKartlari[o.id], isNotNull, reason: o.ad);
+      expect(kuralKartlari[o.id]!.length, inInclusiveRange(3, 4), reason: o.ad);
+      expect(o.sureDk, greaterThan(0), reason: o.ad);
+      expect(o.yerelMax <= o.max, isTrue, reason: o.ad);
+    }
+  });
+
   testWidgets('onboarding sonrası oyun listesi açılır', (tester) async {
     await tester.pumpWidget(const ProviderScope(child: OyunGecesiApp()));
     await tester.pumpAndSettle();
     expect(find.text('Oyun Gecesi'), findsOneWidget);
+    await tester.tap(find.text('Atla'));
+    await tester.pumpAndSettle();
+    expect(find.text('Gizlilik'), findsOneWidget);
     await tester.tap(find.text('Başla'));
     await tester.pumpAndSettle();
     expect(find.text('Oyunlar'), findsOneWidget);
