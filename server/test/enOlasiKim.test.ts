@@ -247,3 +247,18 @@ test('1000 adımlık rastgele simülasyon kilitlenmez', () => {
   }
   assert.ok(l.e.oda.phase === 'FINAL' || l.e.oda.endsAt !== null || l.e.oda.phase === 'DURAKLA');
 });
+
+test('A14: ücretsiz kurucuda yalnız ücretsiz havuz, premium kurucuda tamamı', async () => {
+  const { havuzSec } = await import('../src/games/enOlasiKim.ts');
+  const icerik = {
+    soru07: Array.from({ length: 30 }, (_, i) => ({ id: `q${i}`, metin: `s${i}`, kategori: 'gunluk', ucretsiz: i < 10 })),
+  };
+  assert.equal(havuzSec(icerik, 'gunluk', false).length, 10);
+  assert.equal(havuzSec(icerik, 'gunluk', true).length, 30);
+});
+
+test('premiumHavuz setSettings ile değiştirilemez', () => {
+  const l = lobiKur(3, '07');
+  l.e.gonder('h', 'setSettings', { premiumHavuz: true });
+  assert.deepEqual(l.conns.h.hatalar(), ['INVALID_MESSAGE']);
+});

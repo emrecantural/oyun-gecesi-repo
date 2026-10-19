@@ -562,6 +562,7 @@ export class Oda {
       case 'setSettings': {
         if (!host) return { err: 'NOT_HOST' };
         if (this.phase !== 'LOBBY') return { err: 'WRONG_PHASE' };
+        if ('premiumHavuz' in p) return { err: 'INVALID_MESSAGE' };
         const g = this.def.ayarlariDogrula(p, this.settings);
         if (!g) return { err: 'INVALID_MESSAGE' };
         this.settings = g;

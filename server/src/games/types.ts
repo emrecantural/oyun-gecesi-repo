@@ -23,6 +23,8 @@ export interface Soru07 {
   id: string;
   metin: string;
   kategori: string;
+  /** Paket planına göre ücretsiz havuzda mı; belirtilmemişse ücretsiz sayılır. */
+  ucretsiz?: boolean;
 }
 export interface Icerik {
   soru07: Soru07[];

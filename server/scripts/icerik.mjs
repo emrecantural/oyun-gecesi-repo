@@ -38,6 +38,21 @@ const soru07 = govde
   .filter((r) => r[ix.tur] === 'soru' && (taslak || r[ix.durum] === 'onayli'))
   .map((r) => ({ id: r[ix.id], metin: r[ix.metin], kategori: r[ix.seviye] }));
 
+// Ücretsiz bölme (uygulamadaki ucretsizBol ile aynı): her seviyede id sırasının ilk min(n, max(5, ceil(0,4n))) öğesi.
+const gruplar = new Map();
+for (const q of soru07) {
+  if (!gruplar.has(q.kategori)) gruplar.set(q.kategori, []);
+  gruplar.get(q.kategori).push(q);
+}
+for (const liste of gruplar.values()) {
+  liste.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const n = liste.length;
+  const serbest = Math.min(n, Math.max(5, Math.ceil(0.4 * n)));
+  liste.forEach((q, i) => {
+    q.ucretsiz = i < serbest;
+  });
+}
+
 const cikti =
   '// Bu dosya scripts/icerik.mjs ile üretilir; elle düzenlemeyin.\n' +
   `// Taslak dahil: ${taslak ? 'evet' : 'hayır'}\n` +

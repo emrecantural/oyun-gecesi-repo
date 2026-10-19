@@ -39,8 +39,9 @@ interface Durum {
 
 const OLUMLU = ['gunluk', 'yilbasi'];
 
-function havuzSec(icerik: Icerik, seviye: string): Soru07[] {
-  const tum = icerik.soru07;
+/** Ücretsiz kurucu odasında yalnız ücretsiz havuz kullanılır (A14); premium kurucuda tamamı. */
+export function havuzSec(icerik: Icerik, seviye: string, premium = true): Soru07[] {
+  const tum = premium ? icerik.soru07 : icerik.soru07.filter((q) => q.ucretsiz !== false);
   if (seviye === 'yilbasi') {
     const yb = tum.filter((q) => q.kategori === 'yilbasi');
     return [...yb, ...tum.filter((q) => q.kategori === 'gunluk')];
@@ -77,7 +78,7 @@ export class EnOlasiKim implements Oyun {
   }
 
   basla(ctx: OyunBaglami): string | null {
-    const pool = havuzSec(this.dep.icerik, String(ctx.ayarlar.seviye));
+    const pool = havuzSec(this.dep.icerik, String(ctx.ayarlar.seviye), ctx.ayarlar.premiumHavuz === true);
     const adet = Math.min(Number(ctx.ayarlar.soruSayisi), pool.length);
     if (adet < 1) return 'NO_CONTENT';
     const rand = this.dep.rand;
@@ -378,7 +379,11 @@ export const enOlasiKimTanimi: OyunTanimi = {
   ayarlariDogrula(ham, mevcut): Ayarlar | null {
     const a: Ayarlar = { ...mevcut };
     for (const [k, v] of Object.entries(ham)) {
-      if (k === 'tahmin') {
+      if (k === 'premiumHavuz') {
+        // Yalnız oda kurulurken Worker verir; setSettings ile değiştirilemez (room.ts).
+        if (typeof v !== 'boolean') return null;
+        a.premiumHavuz = v;
+      } else if (k === 'tahmin') {
         if (typeof v !== 'boolean') return null;
         a.tahmin = v;
       } else if (k in SECENEK) {

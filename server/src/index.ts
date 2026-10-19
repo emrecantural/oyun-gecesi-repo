@@ -10,6 +10,14 @@ function json(veri: unknown, status = 200): Response {
   return Response.json(veri, { status });
 }
 
+/** İstemci ayarları + (yalnız 07) kurucunun premium bildirimi. Premium doğrulaması istemci tarafıdır (kabul edilen risk, mobil-yayin §4.2). */
+function odaAyarlari(game: string, b: Record<string, unknown>): Record<string, unknown> | undefined {
+  const temel = typeof b.settings === 'object' && b.settings !== null ? { ...(b.settings as Record<string, unknown>) } : {};
+  delete temel.premiumHavuz;
+  if (game === '07') temel.premiumHavuz = b.premium === true;
+  return Object.keys(temel).length ? temel : undefined;
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -42,7 +50,7 @@ export default {
             game,
             nickname: typeof b.nickname === 'string' ? b.nickname : '',
             installId: b.installId,
-            settings: typeof b.settings === 'object' && b.settings !== null ? b.settings : undefined,
+            settings: odaAyarlari(game, b),
           }),
         });
         if (r.status === 409) continue;
