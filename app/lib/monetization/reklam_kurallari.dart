@@ -1,4 +1,4 @@
-/// Reklam sıklık kuralları (mobil-yayin-ve-para-kazanma.md §3.2). Saf mantık; plugin yok.
+// Reklam sıklık kuralları (mobil-yayin-ve-para-kazanma.md §3.2). Saf mantık; plugin yok.
 
 /// Yılbaşı gecesi penceresi: 31 Ara 20:00 – 01 Oca 02:00 (cihaz yerel saati). D-040.
 bool yilbasiPenceresi(DateTime t) {
