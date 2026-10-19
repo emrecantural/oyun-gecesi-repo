@@ -53,7 +53,7 @@ const oyunlar = <OyunBilgisi>[
   OyunBilgisi(id: '13', ad: 'Kelime Zinciri', kisa: 'Son harfle yeni kelime.', kategori: OyunKategori.kelime, min: 2, max: 15, ikon: Icons.link_rounded),
   OyunBilgisi(id: '14', ad: 'Birbirimizi Tanıyoruz', kisa: 'Arkadaşını ne kadar tanıyorsun?', kategori: OyunKategori.konusma, min: 2, max: 12, ikon: Icons.people_alt_rounded),
   OyunBilgisi(id: '15', ad: 'Bilgi Yarışması', kisa: 'Hızlı sorular, hızlı cevaplar.', kategori: OyunKategori.bilgi, min: 2, max: 30, ikon: Icons.quiz_rounded),
-  OyunBilgisi(id: '18', ad: 'Geri Sayımı Yakala', kisa: 'Tam zamanında bas.', kategori: OyunKategori.parti, min: 2, max: 30, ikon: Icons.timer_rounded),
+  OyunBilgisi(id: '18', ad: 'Geri Sayımı Yakala', kisa: 'Tam zamanında bas.', kategori: OyunKategori.parti, min: 2, max: 6, ikon: Icons.timer_rounded),
   OyunBilgisi(id: '23', ad: 'Yeni Yıl Kehaneti', kisa: 'Yeni yılın falına bak.', kategori: OyunKategori.cekilis, min: 1, max: 30, ikon: Icons.auto_awesome_rounded),
   OyunBilgisi(id: '24', ad: 'Gizli Hediye Çekilişi', kisa: 'Kim kime hediye alacak?', kategori: OyunKategori.cekilis, min: 3, max: 50, ikon: Icons.card_giftcard_rounded),
   OyunBilgisi(id: '25', ad: 'Şarkı Mırıldan', kisa: 'Mırılda, bulsunlar.', kategori: OyunKategori.parti, min: 4, max: 12, ikon: Icons.music_note_rounded),

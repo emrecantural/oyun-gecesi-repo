@@ -19,11 +19,15 @@ final icerikProvider =
     taslakDahil: icerikTaslakDahil,
     grupAnahtari: grupAnahtariIcin(dosya),
   );
-  return premium ? hepsi : hepsi.where((o) => o.ucretsiz).toList();
+  final hepsiAcik = premium || tamamenUcretsiz(dosya);
+  return hepsiAcik ? hepsi : hepsi.where((o) => o.ucretsiz).toList();
 });
+
+/// Çekirdek mekaniği tamamen ücretsiz oyunlar (paket-plani.md): 01, 03, 24.
+bool tamamenUcretsiz(String dosya) =>
+    dosya.startsWith('01-') || dosya.startsWith('03-') || dosya.startsWith('24-');
 
 /// Paket planındaki bölme birimi dosyaya göre değişir (varsayılan: seviye).
 String Function(IcerikOgesi)? grupAnahtariIcin(String dosya) {
-  if (dosya.startsWith('02-')) return (o) => o.seviye; // mekân (düzeltilecek)
   return null;
 }
